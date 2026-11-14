@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Ventas HIH</title>
+    <title>App Inventario Hob</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome para iconos -->
@@ -40,7 +40,7 @@
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-2">
             <div class="flex items-center space-x-3">
                 <i class="fa-solid fa-boxes-stacked text-2xl"></i>
-                <h1 class="text-2xl font-bold tracking-wide">App Ventas HIH</h1>
+                <h1 class="text-2xl font-bold tracking-wide">App Inventario Hob</h1>
             </div>
             <!-- Navegación por las 5 pestañas -->
             <nav class="flex flex-wrap justify-center gap-1 bg-indigo-800 p-1 rounded-lg text-xs md:text-sm">
@@ -80,13 +80,8 @@
                     </div>
                     <form id="form-producto" onsubmit="guardarProducto(event)" class="space-y-4">
                         <input type="hidden" id="producto-id">
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre del Producto</label>
-                            <div class="relative">
-                                <input type="text" id="prod-nombre" required placeholder="" class="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase">
-                                <button type="button" onclick="limpiarInput('prod-nombre')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 font-bold text-base" title="Limpiar">×</button>
-                            </div>
-                        </div>
+                        
+                        <!-- CÓDIGO DE BARRA (Movido Arriba con Escáner) -->
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Código de Barra</label>
                             <div class="flex gap-2">
@@ -96,6 +91,16 @@
                                 </button>
                             </div>
                         </div>
+
+                        <!-- NOMBRE DEL PRODUCTO (Movido Abajo con botón X) -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre del Producto</label>
+                            <div class="relative">
+                                <input type="text" id="prod-nombre" required placeholder="EJ. GENGLOBEN 30 G" class="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase">
+                                <button type="button" onclick="limpiarInput('prod-nombre')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 font-bold text-base" title="Limpiar">×</button>
+                            </div>
+                        </div>
+
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Precio (L)</label>
@@ -154,7 +159,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Teléfono</label>
-                                <input type="text" id="cli-telefono" placeholder="0000-0000" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                                <input type="text" id="cli-telefono" placeholder="9999-9999" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Límite de Crédito (L)</label>
@@ -403,7 +408,7 @@
     </div>
 
     <footer class="bg-white border-t border-gray-200 py-4 text-center text-xs text-gray-500 mt-auto">
-        App Ventas HIH &copy; 2026 - Gestión Integral de Productos, Clientes, Ventas y Créditos (L)
+        App Inventario Hob &copy; 2026 - Gestión Integral de Productos, Clientes, Ventas y Créditos (L)
     </footer>
 
     <!-- LÓGICA JAVASCRIPT -->
@@ -434,7 +439,7 @@
         function exportarRespaldo() {
             const datosRespaldo = {
                 fechaRespaldo: new Date().toISOString(),
-                app: 'App Ventas HIH',
+                app: 'App Inventario Hob',
                 productos,
                 clientes,
                 ventas,
@@ -463,7 +468,7 @@
                 try {
                     const datos = JSON.parse(e.target.result);
                     if (!datos.productos || !Array.isArray(datos.productos)) {
-                        alert('El archivo seleccionado no es un respaldo válido de App Ventas HIH.');
+                        alert('El archivo seleccionado no es un respaldo válido de App Inventario Hob.');
                         return;
                     }
 
@@ -1116,7 +1121,7 @@
             }
 
             const textoTicket = 
-`TICKET DE PEDIDO - App Ventas HIH
+`TICKET DE PEDIDO - APP INVENTARIO HOB
 ------------------------------------
 FECHA: ${v.fecha}
 CLIENTE: ${v.cliente}
