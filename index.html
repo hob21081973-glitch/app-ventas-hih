@@ -83,7 +83,7 @@
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre del Producto</label>
                             <div class="relative">
-                                <input type="text" id="prod-nombre" required placeholder="" class="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase">
+                                <input type="text" id="prod-nombre" required placeholder="EJ. GENGLOBEN 30 G" class="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase">
                                 <button type="button" onclick="limpiarInput('prod-nombre')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 font-bold text-base" title="Limpiar">×</button>
                             </div>
                         </div>
@@ -147,14 +147,14 @@
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre Completo</label>
                             <div class="relative">
-                                <input type="text" id="cli-nombre" required placeholder="NOMBRE CLIENTE" class="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase">
+                                <input type="text" id="cli-nombre" required placeholder="NOMBRE DEL CLIENTE" class="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase">
                                 <button type="button" onclick="limpiarInput('cli-nombre')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 font-bold text-base" title="Limpiar">×</button>
                             </div>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Teléfono</label>
-                                <input type="text" id="cli-telefono" placeholder="0000-0000" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                                <input type="text" id="cli-telefono" placeholder="9999-9999" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Límite de Crédito (L)</label>
@@ -164,7 +164,7 @@
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Dirección</label>
                             <div class="relative">
-                                <input type="text" id="cli-direccion" placeholder="DIRECCION CLIENTE" class="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase">
+                                <input type="text" id="cli-direccion" placeholder="DIRECCIÓN DEL CLIENTE" class="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase">
                                 <button type="button" onclick="limpiarInput('cli-direccion')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 font-bold text-base" title="Limpiar">×</button>
                             </div>
                         </div>
@@ -208,12 +208,19 @@
                     </h2>
                     
                     <form id="form-venta" onsubmit="procesarVentaGeneral(event)" class="space-y-4">
+                        <input type="hidden" id="venta-producto-id">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Producto</label>
                             <div class="flex gap-2">
-                                <select id="venta-producto" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
-                                    <!-- Dinámico -->
-                                </select>
+                                <div class="relative flex-grow">
+                                    <input type="text" id="venta-producto-nombre" readonly required placeholder="SELECCIONAR O ESCANEAR PRODUCTO" class="w-full pl-4 pr-16 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase text-sm cursor-pointer" onclick="abrirModalBusquedaVenta()">
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-2 space-x-1">
+                                        <button type="button" onclick="limpiarProductoVenta()" class="text-gray-400 hover:text-gray-600 font-bold text-base px-1" title="Limpiar">×</button>
+                                        <button type="button" onclick="abrirModalBusquedaVenta()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 p-1.5 rounded-md transition" title="Buscar con Lupa">
+                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                        </button>
+                                    </div>
+                                </div>
                                 <button type="button" onclick="abrirEscanerCamara('venta')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-600 px-3 py-2 rounded-lg border border-emerald-200 text-sm font-medium transition flex items-center gap-1 shrink-0" title="Escanear Código para Venta">
                                     <i class="fa-solid fa-barcode text-lg"></i>
                                 </button>
@@ -410,6 +417,11 @@
             }
         }
 
+        function limpiarProductoVenta() {
+            document.getElementById('venta-producto-id').value = '';
+            document.getElementById('venta-producto-nombre').value = '';
+        }
+
         function reproducirPitidoExito() {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -502,7 +514,8 @@
 
                 if (prodEncontrado) {
                     reproducirPitidoExito();
-                    document.getElementById('venta-producto').value = prodEncontrado.id;
+                    document.getElementById('venta-producto-id').value = prodEncontrado.id;
+                    document.getElementById('venta-producto-nombre').value = `${prodEncontrado.name} (L ${prodEncontrado.price.toFixed(2)})`;
                     agregarAlCarrito();
                 } else {
                     alert(`No se encontró ningún producto con el código de barra: ${codigoLectura}`);
@@ -566,6 +579,16 @@
             document.getElementById('modal-input-busqueda').focus();
         }
 
+        function abrirModalBusquedaVenta() {
+            modoModalActual = 'venta';
+            document.getElementById('modal-titulo').textContent = "SELECCIONAR PRODUCTO PARA VENTA";
+            document.getElementById('modal-input-busqueda').value = '';
+            renderizarListaModal(productos);
+            document.getElementById('modal-busqueda').classList.remove('hidden');
+            document.getElementById('modal-busqueda').classList.add('flex');
+            document.getElementById('modal-input-busqueda').focus();
+        }
+
         function cerrarModalBusqueda() {
             document.getElementById('modal-busqueda').classList.remove('flex');
             document.getElementById('modal-busqueda').classList.add('hidden');
@@ -577,6 +600,8 @@
                 renderizarListaModal(productos.filter(p => p.name.toLowerCase().includes(filtro) || (p.barcode && p.barcode.toLowerCase().includes(filtro))));
             } else if (modoModalActual === 'cliente') {
                 renderizarListaModal(clientes.filter(c => c.nombre.toLowerCase().includes(filtro)));
+            } else if (modoModalActual === 'venta') {
+                renderizarListaModal(productos.filter(p => p.name.toLowerCase().includes(filtro) || (p.barcode && p.barcode.toLowerCase().includes(filtro))));
             }
         }
 
@@ -596,6 +621,13 @@
                 } else if (modoModalActual === 'cliente') {
                     div.innerHTML = `<div><span class="font-semibold text-gray-800">${item.nombre}</span><span class="text-xs text-gray-500 block">Tel: ${item.telefono || '-'}</span></div>`;
                     div.onclick = () => { editarCliente(item.id); cerrarModalBusqueda(); };
+                } else if (modoModalActual === 'venta') {
+                    div.innerHTML = `<div><span class="font-semibold text-gray-800">${item.name}</span><span class="text-xs text-gray-500 block">Stock: ${item.stock} | L ${item.price.toFixed(2)}</span></div>`;
+                    div.onclick = () => {
+                        document.getElementById('venta-producto-id').value = item.id;
+                        document.getElementById('venta-producto-nombre').value = `${item.name} (L ${item.price.toFixed(2)})`;
+                        cerrarModalBusqueda();
+                    };
                 }
                 contenedor.appendChild(div);
             });
@@ -796,20 +828,18 @@
 
         // --- VENTAS & CARRITO ---
         function poblarSelectoresVenta() {
-            const selectProd = document.getElementById('venta-producto');
             const selectCli = document.getElementById('venta-cliente');
-            selectProd.innerHTML = productos.map(p => `<option value="${p.id}">${p.name} ${p.barcode ? `(${p.barcode})` : ''}</option>`).join('');
             selectCli.innerHTML = '<option value="">GENERAL (CONTADO)</option>' +
                 clientes.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
         }
 
         function agregarAlCarrito() {
-            const prodId = document.getElementById('venta-producto').value;
+            const prodId = document.getElementById('venta-producto-id').value;
             const cant = parseInt(document.getElementById('venta-cantidad').value) || 0;
             const prod = productos.find(p => p.id == prodId);
 
             if (!prod || cant <= 0) {
-                alert('Selecciona un producto válido y cantidad mayor a 0.');
+                alert('Selecciona un producto válido usando la lupa o el escáner y una cantidad mayor a 0.');
                 return;
             }
             if (prod.stock < cant) {
@@ -833,6 +863,7 @@
                 });
             }
             renderizarCarrito();
+            limpiarProductoVenta();
         }
 
         function renderizarCarrito() {
@@ -931,6 +962,7 @@
             carritoVenta = [];
             renderizarCarrito();
             document.getElementById('form-venta').reset();
+            limpiarProductoVenta();
             poblarSelectoresVenta();
 
             renderizarProductos();
