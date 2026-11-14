@@ -90,7 +90,7 @@
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Código de Barra</label>
                             <div class="flex gap-2">
-                                <input type="text" id="prod-barcode" onchange="verificarBarcodeStock()" placeholder="Escanear codigo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase">
+                                <input type="text" id="prod-barcode" onchange="verificarBarcodeStock()" placeholder="Escanear o escribir código" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase">
                                 <button type="button" onclick="abrirEscanerCamara('stock')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-2 rounded-lg border border-indigo-200 text-sm font-medium transition flex items-center gap-1 shrink-0" title="Escanear con cámara">
                                     <i class="fa-solid fa-barcode text-lg"></i>
                                 </button>
@@ -284,7 +284,7 @@
                 </div>
             </section>
 
-            <!-- ================= 5. PESTAÑA REPORTES ================= -->
+            <!-- ================= 5. PESTAÑA REPORTES Y RESPALDO ================= -->
             <section id="pestana-reportes" class="tab-pane w-full space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 border-l-4 border-l-indigo-500">
@@ -298,6 +298,27 @@
                     <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 border-l-4 border-l-amber-500">
                         <p class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Por Cobrar (Créditos)</p>
                         <h3 id="rep-total-creditos" class="text-2xl font-bold text-amber-600 mt-1">L 0.00</h3>
+                    </div>
+                </div>
+
+                <!-- PANEL DE COPIA DE SEGURIDAD (EXPORTAR / IMPORTAR) -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-indigo-100 bg-indigo-50/40 space-y-3">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div>
+                            <h3 class="text-lg font-bold text-indigo-900 flex items-center">
+                                <i class="fa-solid fa-shield-halved text-indigo-600 mr-2"></i> Copia de Seguridad (Respaldo de Datos)
+                            </h3>
+                            <p class="text-xs text-gray-600 mt-0.5">Descarga tus productos, clientes y ventas antes de actualizar la app o limpiar tu navegador.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                            <button type="button" onclick="exportarRespaldo()" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-download"></i> Guardar Respaldo
+                            </button>
+                            <label class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow transition flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="fa-solid fa-upload"></i> Restaurar Respaldo
+                                <input type="file" id="input-importar-respaldo" accept=".json" onchange="importarRespaldo(event)" class="hidden">
+                            </label>
+                        </div>
                     </div>
                 </div>
 
@@ -398,6 +419,7 @@
         let carritoVenta = [];
         let html5QrCodeScanner = null;
         let modoEscanerOrigen = '';
+        let modoModalActual = '';
 
         window.onload = function() {
             renderizarProductos();
@@ -407,6 +429,72 @@
             renderizarCreditos();
             renderizarReportes();
         };
+
+        // --- EXPORTAR E IMPORTAR RESPALDO ---
+        function exportarRespaldo() {
+            const datosRespaldo = {
+                fechaRespaldo: new Date().toISOString(),
+                app: 'App Ventas HIH',
+                productos,
+                clientes,
+                ventas,
+                creditos
+            };
+
+            const blob = new Blob([JSON.stringify(datosRespaldo, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const enlace = document.createElement('a');
+            const fechaStr = new Date().toISOString().split('T')[0];
+
+            enlace.href = url;
+            enlace.download = `Respaldo_Inventario_Hob_${fechaStr}.json`;
+            document.body.appendChild(enlace);
+            enlace.click();
+            document.body.removeChild(enlace);
+            URL.revokeObjectURL(url);
+        }
+
+        function importarRespaldo(event) {
+            const archivo = event.target.files[0];
+            if (!archivo) return;
+
+            const lector = new FileReader();
+            lector.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (!datos.productos || !Array.isArray(datos.productos)) {
+                        alert('El archivo seleccionado no es un respaldo válido de App Ventas HIH.');
+                        return;
+                    }
+
+                    if (confirm('¿Deseas restaurar esta copia de seguridad? Se reemplazarán los datos actuales con los del archivo.')) {
+                        productos = datos.productos || [];
+                        clientes = datos.clientes || [];
+                        ventas = datos.ventas || [];
+                        creditos = datos.creditos || [];
+
+                        localStorage.setItem('hob_productos', JSON.stringify(productos));
+                        localStorage.setItem('hob_clientes', JSON.stringify(clientes));
+                        localStorage.setItem('hob_ventas', JSON.stringify(ventas));
+                        localStorage.setItem('hob_creditos', JSON.stringify(creditos));
+
+                        renderizarProductos();
+                        renderizarClientes();
+                        poblarSelectoresVenta();
+                        renderizarVentas();
+                        renderizarCreditos();
+                        renderizarReportes();
+
+                        alert('¡Respaldo restaurado con éxito!');
+                    }
+                } catch (err) {
+                    alert('Error al leer el archivo. Asegúrate de elegir el archivo .json correcto.');
+                } finally {
+                    event.target.value = '';
+                }
+            };
+            lector.readAsText(archivo);
+        }
 
         // --- FUNCIÓN AUXILIAR PARA LIMPIAR INPUTS CON LA 'X' ---
         function limpiarInput(idElemento) {
