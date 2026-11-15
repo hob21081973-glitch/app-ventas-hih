@@ -116,76 +116,67 @@
         <!-- ===================================================================== -->
         <section id="panel-dashboard" class="tab-panel space-y-6">
             
-            <!-- Bloque Principal de Saldos en Tiempo Real -->
-            <div class="bg-gradient-to-r from-slate-900 via-brand-900 to-slate-900 rounded-2xl p-6 sm:p-7 shadow-lg text-white">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <!-- Bloque Principal de Saldos en Tiempo Real (Efectivo Libre + Fondos/Proyectos) -->
+            <div class="bg-gradient-to-r from-slate-900 via-brand-900 to-slate-900 rounded-2xl p-5 sm:p-6 shadow-lg text-white">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
                     <div>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-brand-500/20 text-brand-200 border border-brand-400/30 mb-2">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-brand-500/20 text-brand-200 border border-brand-400/30 mb-1.5">
                             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                            Estado Financiero Actualizado
+                            Cuadre General en Tiempo Real
                         </span>
-                        <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight text-white">Resumen Ejecutivo de Saldos</h2>
+                        <h2 class="text-lg sm:text-xl font-extrabold tracking-tight text-white">Saldos de Cuentas Libres y Fondos / Proyectos</h2>
                     </div>
-                    <button onclick="switchTab('nuevo')" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-500 shadow-md shadow-brand-950/40 border border-brand-400/30 transition-all self-start sm:self-auto">
-                        <i class="ph-bold ph-plus-circle text-lg"></i>
-                        <span>Registrar Nuevo Movimiento</span>
-                    </button>
-                </div>
-
-                <!-- Tarjetas de Saldos Actuales -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- Saldo Caja Chica -->
-                    <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-5 flex items-center justify-between">
-                        <div>
-                            <span class="text-xs font-semibold uppercase tracking-wider text-brand-200 block mb-1.5">Caja Chica (Disponible Libre)</span>
-                            <span id="card-saldo-caja" class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">L. 0.00</span>
-                        </div>
-                        <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-300 shrink-0">
-                            <i class="ph-duotone ph-coins text-2xl"></i>
-                        </div>
-                    </div>
-
-                    <!-- Saldo Bancos -->
-                    <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-5 flex items-center justify-between">
-                        <div>
-                            <span class="text-xs font-semibold uppercase tracking-wider text-brand-200 block mb-1.5">Bancos (Disponible Libre)</span>
-                            <span id="card-saldo-banco" class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">L. 0.00</span>
-                        </div>
-                        <div class="w-12 h-12 rounded-xl bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-300 shrink-0">
-                            <i class="ph-duotone ph-bank text-2xl"></i>
-                        </div>
-                    </div>
-
-                    <!-- Saldo Total General -->
-                    <div class="bg-gradient-to-br from-emerald-500/25 to-teal-600/25 backdrop-blur-md border border-emerald-400/30 rounded-2xl p-5 flex items-center justify-between">
-                        <div>
-                            <span class="text-xs font-semibold uppercase tracking-wider text-emerald-200 block mb-1.5">Saldo Total Consolidado</span>
-                            <span id="card-saldo-total" class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">L. 0.00</span>
-                        </div>
-                        <div class="w-12 h-12 rounded-xl bg-emerald-500/30 border border-emerald-400/40 flex items-center justify-center text-emerald-200 shrink-0">
-                            <i class="ph-duotone ph-scales text-2xl"></i>
-                        </div>
+                    <div class="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+                        <button onclick="openFundModal('create')" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold text-brand-100 bg-white/10 hover:bg-white/20 border border-white/15 transition-all">
+                            <i class="ph-bold ph-folder-plus text-base"></i>
+                            <span>+ Nuevo Fondo</span>
+                        </button>
+                        <button onclick="switchTab('nuevo')" class="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-brand-600 hover:bg-brand-500 shadow-md shadow-brand-950/40 border border-brand-400/30 transition-all">
+                            <i class="ph-bold ph-plus-circle text-base"></i>
+                            <span>Nuevo Movimiento</span>
+                        </button>
                     </div>
                 </div>
-            </div>
 
-            <!-- Disponibilidad Actual por Fondo / Asignación -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-                    <div>
-                        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                            <i class="ph-duotone ph-folders text-xl text-brand-600"></i>
-                            <span>Saldos Independientes por Fondo / Proyecto</span>
-                        </h3>
-                        <p class="text-xs text-slate-500">Cada fondo lleva su saldo independiente. El Saldo Total Consolidado suma Caja Chica + Bancos + Todos los Fondos.</p>
+                <!-- Grid Unificado y Compacto de Saldos (Caja, Banco, Aportaciones, Proyectos y Total Consolidado) -->
+                <div id="dash-unified-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                    <!-- Saldo Caja Chica (Libre) -->
+                    <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-xl p-3.5 flex items-center justify-between">
+                        <div class="min-w-0 pr-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-200 block truncate">Caja Chica (Libre)</span>
+                            <span id="card-saldo-caja" class="text-lg sm:text-xl font-extrabold text-white tracking-tight block mt-0.5">L. 0.00</span>
+                        </div>
+                        <div class="w-9 h-9 rounded-lg bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-300 shrink-0">
+                            <i class="ph-duotone ph-coins text-lg"></i>
+                        </div>
                     </div>
-                    <button onclick="openFundModal('create')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-200 transition-colors self-start sm:self-auto">
-                        <i class="ph-bold ph-folder-plus text-sm"></i>
-                        <span>+ Nuevo Fondo</span>
-                    </button>
-                </div>
-                <div id="dash-funds-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-                    <!-- Tarjetas de fondos generadas dinámicamente -->
+
+                    <!-- Saldo Bancos (Libre) -->
+                    <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-xl p-3.5 flex items-center justify-between">
+                        <div class="min-w-0 pr-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-sky-200 block truncate">Bancos (Libre)</span>
+                            <span id="card-saldo-banco" class="text-lg sm:text-xl font-extrabold text-white tracking-tight block mt-0.5">L. 0.00</span>
+                        </div>
+                        <div class="w-9 h-9 rounded-lg bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-300 shrink-0">
+                            <i class="ph-duotone ph-bank text-lg"></i>
+                        </div>
+                    </div>
+
+                    <!-- Contenedor Dinámico para Aportaciones y Proyectos -->
+                    <div id="dash-funds-inline-cards" class="contents">
+                        <!-- Tarjetas de cada fondo/proyecto generadas dinámicamente -->
+                    </div>
+
+                    <!-- Saldo Total Consolidado -->
+                    <div class="bg-gradient-to-br from-emerald-500/30 to-teal-600/30 backdrop-blur-md border border-emerald-400/40 rounded-xl p-3.5 flex items-center justify-between">
+                        <div class="min-w-0 pr-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-200 block truncate">Total Consolidado</span>
+                            <span id="card-saldo-total" class="text-lg sm:text-xl font-extrabold text-white tracking-tight block mt-0.5">L. 0.00</span>
+                        </div>
+                        <div class="w-9 h-9 rounded-lg bg-emerald-500/30 border border-emerald-400/40 flex items-center justify-center text-emerald-200 shrink-0">
+                            <i class="ph-duotone ph-scales text-lg"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1700,10 +1691,10 @@
         }
 
         /**
-         * Renderiza las tarjetas de disponibilidad por cada Fondo en el Dashboard
+         * Renderiza las tarjetas compactas de cada Fondo/Proyecto dentro del panel ejecutivo del Dashboard
          */
         function renderDashboardFunds() {
-            const container = document.getElementById('dash-funds-grid');
+            const container = document.getElementById('dash-funds-inline-cards');
             if (!container) return;
 
             const balances = {};
@@ -1722,18 +1713,18 @@
                 const val = balances[fundName];
                 const isNegative = val < 0;
                 const card = document.createElement('div');
-                card.className = 'rounded-xl border border-slate-200 bg-slate-50/70 p-4 flex items-center justify-between hover:border-brand-300 transition-colors';
+                card.className = 'bg-indigo-950/50 backdrop-blur-md border border-indigo-400/25 rounded-xl p-3.5 flex items-center justify-between';
                 card.innerHTML = `
                     <div class="min-w-0 pr-2">
-                        <span class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-700 block truncate" title="${escapeHTML(fundName)}">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-200 block truncate" title="${escapeHTML(fundName)}">
                             ${escapeHTML(fundName)}
                         </span>
-                        <span class="text-lg sm:text-xl font-extrabold tracking-tight block mt-1 ${isNegative ? 'text-rose-700' : 'text-slate-900'}">
+                        <span class="text-lg sm:text-xl font-extrabold tracking-tight block mt-0.5 ${isNegative ? 'text-rose-300' : 'text-white'}">
                             ${formatCurrency(val)}
                         </span>
                     </div>
-                    <div class="w-10 h-10 rounded-xl bg-indigo-100/80 text-indigo-700 flex items-center justify-center shrink-0">
-                        <i class="ph-duotone ph-folder-open text-xl"></i>
+                    <div class="w-9 h-9 rounded-lg bg-indigo-500/25 border border-indigo-400/30 flex items-center justify-center text-indigo-200 shrink-0">
+                        <i class="ph-duotone ph-folder-open text-lg"></i>
                     </div>
                 `;
                 container.appendChild(card);
