@@ -42,7 +42,7 @@
         .clear-btn { position: absolute; right: 8px; background: none; border: none; color: #9ca3af; font-size: 1.1rem; cursor: pointer; padding: 4px; line-height: 1; }
         .clear-btn:hover { color: #374151; }
 
-        input[type="text"], input[type="number"], select { width: 100%; padding: 9px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9rem; text-transform: uppercase; outline: none; background: #fff; }
+        input[type="text"], input[type="number"], input[type="date"], select { width: 100%; padding: 9px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9rem; text-transform: uppercase; outline: none; background: #fff; }
         input:focus, select:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
         
         /* Botones */
@@ -71,11 +71,11 @@
         .stat-card p { font-size: 0.7rem; text-transform: uppercase; color: #6b7280; font-weight: 700; }
         .stat-card h3 { font-size: 1.3rem; font-weight: bold; margin-top: 3px; color: #1f2937; }
 
-        /* Tablas */
-        .table-container { width: 100%; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
-        th { background-color: #f3f4f6; color: #374151; text-transform: uppercase; font-size: 0.7rem; padding: 10px 8px; border-bottom: 2px solid #e5e7eb; white-space: nowrap; }
-        td { padding: 10px 8px; border-bottom: 1px solid #e5e7eb; color: #4b5563; }
+        /* Tablas tipo Excel horizontal con scroll */
+        .table-container { width: 100%; overflow-x: auto; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; min-width: 750px; }
+        th { background-color: #f3f4f6; color: #374151; text-transform: uppercase; font-size: 0.7rem; padding: 10px; border-bottom: 2px solid #e5e7eb; white-space: nowrap; }
+        td { padding: 10px; border-bottom: 1px solid #e5e7eb; color: #4b5563; white-space: nowrap; }
         tr:hover { background-color: #f9fafb; }
 
         /* Modales */
@@ -160,7 +160,7 @@
                 <div class="flex-between" style="margin-bottom: 12px; gap: 8px; flex-wrap: wrap;">
                     <h3 style="font-size: 1rem;">Productos (A-Z)</h3>
                     <div class="input-with-clear" style="max-width: 180px;">
-                        <input type="text" id="buscar-producto" onkeyup="renderizarProductos()" placeholder="Buscar..." style="padding: 6px 28px 6px 6px; font-size: 0.8rem;">
+                        <input type="text" id="buscar-producto" onkeyup="renderizarProductos()" placeholder="Buscar..." style="padding: 6px 28px 6px 6px; font-size: 0.8rem; text-transform: uppercase;">
                         <button type="button" class="clear-btn" onclick="limpiarInput('buscar-producto'); renderizarProductos();" style="right: 4px; font-size: 1rem;">&times;</button>
                     </div>
                 </div>
@@ -244,6 +244,13 @@
                     <input type="hidden" id="venta-producto-id">
                     <input type="hidden" id="editando-venta-id" value="">
                     
+                    <div class="form-group">
+                        <label>Fecha de la Venta</label>
+                        <div class="input-with-clear">
+                            <input type="date" id="venta-fecha" required>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label>Código de Barra</label>
                         <div class="input-group">
@@ -352,13 +359,14 @@
 
             <div class="card">
                 <h3 style="margin-bottom: 10px; font-size: 1rem;"><i class="fa-solid fa-list" style="color: #4f46e5;"></i> Historial de Ventas y Tickets</h3>
+                <p style="font-size: 0.75rem; color: #6b7280; margin-bottom: 8px;"><i class="fa-solid fa-arrows-left-right"></i> Desliza horizontalmente para ver todo el detalle.</p>
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
                                 <th>Fecha</th>
                                 <th>Cliente</th>
-                                <th>Producto</th>
+                                <th>Producto(s)</th>
                                 <th>Cant. x P. Unit.</th>
                                 <th>Tipo</th>
                                 <th>Total</th>
@@ -378,7 +386,7 @@
             <h3 id="modal-titulo" style="margin-bottom: 10px; font-size: 1rem;">Buscar</h3>
             <div class="form-group">
                 <div class="input-with-clear">
-                    <input type="text" id="modal-input-busqueda" onkeyup="filtrarResultadosModal()" placeholder="ESCRIBE PARA BUSCAR...">
+                    <input type="text" id="modal-input-busqueda" onkeyup="filtrarResultadosModal()" placeholder="ESCRIBE PARA BUSCAR..." style="text-transform: uppercase;">
                     <button type="button" class="clear-btn" onclick="limpiarInput('modal-input-busqueda'); filtrarResultadosModal();">&times;</button>
                 </div>
             </div>
@@ -433,9 +441,11 @@
         let html5QrCodeScanner = null;
         let modoEscanerOrigen = '';
         let modoModalActual = '';
-        let ventaEnEdicionOriginal = null; // Almacena el respaldo exacto por si se cancela la edición
+        let ventaEnEdicionOriginal = null;
 
         window.onload = function() {
+            // Establecer fecha actual por defecto en el campo de fecha de venta
+            document.getElementById('venta-fecha').value = new Date().toISOString().split('T')[0];
             renderizarProductos();
             renderizarClientes();
             poblarSelectoresVenta();
@@ -569,7 +579,6 @@
             } else { 
                 limpiarFormProducto(); 
                 document.getElementById('prod-barcode').value = barcode; 
-                // Si no se encuentra, el cursor cae en la caja de texto Nombre de Producto
                 document.getElementById('prod-nombre').focus(); 
             }
         }
@@ -582,7 +591,6 @@
                 reproducirPitidoExito();
                 document.getElementById('venta-producto-id').value = prod.id;
                 document.getElementById('venta-producto-nombre').value = `${prod.name} (L ${prod.price.toFixed(2)})`;
-                // Si la búsqueda es exitosa, el cursor cae en la caja de texto Cantidad
                 document.getElementById('venta-cantidad').focus();
                 document.getElementById('venta-cantidad').select();
             } else { 
@@ -848,6 +856,7 @@
         function procesarVentaGeneral(e) {
             e.preventDefault();
             if (carritoVenta.length === 0) { alert('Agrega al menos un producto al carrito.'); return; }
+            const fechaVenta = document.getElementById('venta-fecha').value || new Date().toISOString().split('T')[0];
             const tipo = document.getElementById('venta-tipo').value;
             const cliId = document.getElementById('venta-cliente').value;
             let clienteNombre = 'GENERAL';
@@ -866,10 +875,16 @@
             const editId = document.getElementById('editando-venta-id').value;
             if (editId) {
                 const idx = ventas.findIndex(v => v.id == editId);
-                if (idx !== -1) { ventas[idx].items = [...carritoVenta]; ventas[idx].cliente = clienteNombre; ventas[idx].tipo = tipo; ventas[idx].total = totalVenta; }
+                if (idx !== -1) { 
+                    ventas[idx].fecha = fechaVenta;
+                    ventas[idx].items = [...carritoVenta]; 
+                    ventas[idx].cliente = clienteNombre; 
+                    ventas[idx].tipo = tipo; 
+                    ventas[idx].total = totalVenta; 
+                }
                 cancelarEdicionVenta();
             } else {
-                ventas.push({ id: Date.now(), fecha: new Date().toISOString().split('T')[0], items: [...carritoVenta], cliente: clienteNombre, tipo, total: totalVenta });
+                ventas.push({ id: Date.now(), fecha: fechaVenta, items: [...carritoVenta], cliente: clienteNombre, tipo, total: totalVenta });
             }
             localStorage.setItem('hob_ventas', JSON.stringify(ventas));
 
@@ -883,7 +898,9 @@
                 }
             }
 
-            carritoVenta = []; renderizarCarrito(); document.getElementById('form-venta').reset(); limpiarProductoVenta(); poblarSelectoresVenta();
+            carritoVenta = []; renderizarCarrito(); document.getElementById('form-venta').reset(); 
+            document.getElementById('venta-fecha').value = new Date().toISOString().split('T')[0];
+            limpiarProductoVenta(); poblarSelectoresVenta();
             renderizarProductos(); renderizarVentas(); renderizarCreditos();
             alert('¡Venta procesada con éxito!');
         }
@@ -892,12 +909,12 @@
             const v = ventas.find(item => item.id == id);
             if (!v) return;
             
-            // Guardamos una copia exacta del estado original por si el usuario decide cancelar la edición
             ventaEnEdicionOriginal = JSON.parse(JSON.stringify(v));
 
             carritoVenta = [];
             (v.items || []).forEach(i => carritoVenta.push({ productoId: i.productoId || Date.now(), name: i.name || i.nombre, precio: i.precio, cantidad: i.cantidad }));
             renderizarCarrito();
+            document.getElementById('venta-fecha').value = v.fecha || new Date().toISOString().split('T')[0];
             document.getElementById('venta-tipo').value = v.tipo || 'CONTADO';
             const sel = document.getElementById('venta-cliente');
             for (let i = 0; i < sel.options.length; i++) { if (sel.options[i].text === v.cliente) { sel.selectedIndex = i; break; } }
@@ -916,9 +933,7 @@
         function cancelarEdicionVenta() {
             const editId = document.getElementById('editando-venta-id').value;
             
-            // Si teníamos una venta original en edición y se cancela sin hacer cambios, la devolvemos intacta al historial
             if (editId && ventaEnEdicionOriginal) {
-                // Reaplicamos los efectos en stock/crédito porque al iniciar la edición se habían revertido temporalmente
                 aplicarEfectosVenta(ventaEnEdicionOriginal);
                 ventas.push(ventaEnEdicionOriginal);
                 localStorage.setItem('hob_ventas', JSON.stringify(ventas));
@@ -936,6 +951,7 @@
             carritoVenta = []; 
             renderizarCarrito(); 
             document.getElementById('form-venta').reset(); 
+            document.getElementById('venta-fecha').value = new Date().toISOString().split('T')[0];
             limpiarProductoVenta();
         }
 
@@ -1004,7 +1020,7 @@ ${div}
         function renderizarVentas() {
             const tbody = document.getElementById('tabla-ventas');
             tbody.innerHTML = '';
-            if (ventas.length === 0) { tbody.innerHTML = `<tr><td colspan="7" class="text-center" style="color: #9ca3af; padding: 15px; font-size: 0.85rem;">No hay ventas registradas.</td></tr>`; return; }
+            if (ventas.length === 0) { tbody.innerHTML = `<tr><td colspan="7" class="text-center" style="color: #9ca3af; padding: 20px; white-space: normal;">No hay ventas registradas.</td></tr>`; return; }
             ventas.slice().reverse().forEach(v => {
                 let prods = "", dets = "";
                 if (v.items) {
