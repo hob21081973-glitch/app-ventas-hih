@@ -36,7 +36,13 @@
         .card { background: white; border-radius: 10px; padding: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-bottom: 15px; width: 100%; }
         .form-group { margin-bottom: 12px; }
         label { display: block; font-size: 0.8rem; font-weight: 600; color: #374151; margin-bottom: 4px; }
-        input[type="text"], input[type="number"], select { width: 100%; padding: 9px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9rem; text-transform: uppercase; outline: none; transition: border 0.2s; background: #fff; }
+        
+        .input-with-clear { position: relative; display: flex; align-items: center; }
+        .input-with-clear input { width: 100%; padding: 9px 32px 9px 9px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9rem; text-transform: uppercase; outline: none; background: #fff; }
+        .clear-btn { position: absolute; right: 8px; background: none; border: none; color: #9ca3af; font-size: 1.1rem; cursor: pointer; padding: 4px; line-height: 1; }
+        .clear-btn:hover { color: #374151; }
+
+        input[type="text"], input[type="number"], select { width: 100%; padding: 9px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9rem; text-transform: uppercase; outline: none; background: #fff; }
         input:focus, select:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
         
         /* Botones */
@@ -128,7 +134,10 @@
                     </div>
                     <div class="form-group">
                         <label>Nombre del Producto</label>
-                        <input type="text" id="prod-nombre" required placeholder="EJ. GENGLOBEN 30 G">
+                        <div class="input-with-clear">
+                            <input type="text" id="prod-nombre" required placeholder="EJ. GENGLOBEN 30 G">
+                            <button type="button" class="clear-btn" onclick="limpiarInput('prod-nombre')">&times;</button>
+                        </div>
                     </div>
                     <div class="grid-2">
                         <div class="form-group">
@@ -150,7 +159,10 @@
             <div class="card">
                 <div class="flex-between" style="margin-bottom: 12px; gap: 8px; flex-wrap: wrap;">
                     <h3 style="font-size: 1rem;">Productos (A-Z)</h3>
-                    <input type="text" id="buscar-producto" onkeyup="renderizarProductos()" placeholder="Buscar producto..." style="max-width: 180px; padding: 6px; font-size: 0.8rem;">
+                    <div class="input-with-clear" style="max-width: 180px;">
+                        <input type="text" id="buscar-producto" onkeyup="renderizarProductos()" placeholder="Buscar..." style="padding: 6px 28px 6px 6px; font-size: 0.8rem;">
+                        <button type="button" class="clear-btn" onclick="limpiarInput('buscar-producto'); renderizarProductos();" style="right: 4px; font-size: 1rem;">&times;</button>
+                    </div>
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr; gap: 10px;" id="contenedor-productos"></div>
             </div>
@@ -167,21 +179,33 @@
                     <input type="hidden" id="cliente-id">
                     <div class="form-group">
                         <label>Nombre Completo</label>
-                        <input type="text" id="cli-nombre" required placeholder="NOMBRE DEL CLIENTE">
+                        <div class="input-with-clear">
+                            <input type="text" id="cli-nombre" required placeholder="NOMBRE DEL CLIENTE">
+                            <button type="button" class="clear-btn" onclick="limpiarInput('cli-nombre')">&times;</button>
+                        </div>
                     </div>
                     <div class="grid-2">
                         <div class="form-group">
                             <label>Teléfono</label>
-                            <input type="text" id="cli-telefono" placeholder="9999-9999">
+                            <div class="input-with-clear">
+                                <input type="text" id="cli-telefono" placeholder="9999-9999">
+                                <button type="button" class="clear-btn" onclick="limpiarInput('cli-telefono')">&times;</button>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label>Límite Crédito (L)</label>
-                            <input type="number" step="0.01" id="cli-limite" placeholder="0.00">
+                            <div class="input-with-clear">
+                                <input type="number" step="0.01" id="cli-limite" placeholder="0.00">
+                                <button type="button" class="clear-btn" onclick="limpiarInput('cli-limite')">&times;</button>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label>Dirección</label>
-                        <input type="text" id="cli-direccion" placeholder="DIRECCIÓN">
+                        <div class="input-with-clear">
+                            <input type="text" id="cli-direccion" placeholder="DIRECCIÓN">
+                            <button type="button" class="clear-btn" onclick="limpiarInput('cli-direccion')">&times;</button>
+                        </div>
                     </div>
                     <div style="display: flex; gap: 8px; margin-top: 10px;">
                         <button type="submit" id="btn-guardar-cliente" class="btn btn-primary" style="flex: 2;">Guardar Cliente</button>
@@ -223,7 +247,10 @@
                     <div class="form-group">
                         <label>Código de Barra</label>
                         <div class="input-group">
-                            <input type="text" id="venta-barcode" onchange="verificarBarcodeVenta()" placeholder="Escanear o escribir">
+                            <div class="input-with-clear" style="flex-grow: 1;">
+                                <input type="text" id="venta-barcode" onchange="verificarBarcodeVenta()" placeholder="Escanear o escribir">
+                                <button type="button" class="clear-btn" onclick="limpiarInput('venta-barcode')">&times;</button>
+                            </div>
                             <button type="button" onclick="abrirEscanerCamara('venta')" class="btn btn-secondary" style="width: auto; padding: 0 12px; background: #d1fae5; color: #065f46;"><i class="fa-solid fa-barcode" style="font-size: 1.1rem;"></i></button>
                         </div>
                     </div>
@@ -231,7 +258,9 @@
                     <div class="form-group">
                         <label>Nombre del Producto</label>
                         <div class="input-group" onclick="abrirModalBusquedaVenta()" style="cursor: pointer;">
-                            <input type="text" id="venta-producto-nombre" readonly required placeholder="SELECCIONAR PRODUCTO" style="background: #f9fafb; cursor: pointer;">
+                            <div class="input-with-clear" style="flex-grow: 1;">
+                                <input type="text" id="venta-producto-nombre" readonly required placeholder="SELECCIONAR PRODUCTO" style="background: #f9fafb; cursor: pointer;">
+                            </div>
                             <button type="button" class="btn btn-secondary" style="width: auto; padding: 0 10px;"><i class="fa-solid fa-magnifying-glass"></i></button>
                         </div>
                     </div>
@@ -239,7 +268,10 @@
                     <div class="grid-3">
                         <div class="form-group">
                             <label>Cant.</label>
-                            <input type="number" min="1" id="venta-cantidad" value="1" required>
+                            <div class="input-with-clear">
+                                <input type="number" min="1" id="venta-cantidad" value="1" required>
+                                <button type="button" class="clear-btn" onclick="document.getElementById('venta-cantidad').value='1'">&times;</button>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label>Pago</label>
@@ -345,7 +377,10 @@
         <div class="modal-box">
             <h3 id="modal-titulo" style="margin-bottom: 10px; font-size: 1rem;">Buscar</h3>
             <div class="form-group">
-                <input type="text" id="modal-input-busqueda" onkeyup="filtrarResultadosModal()" placeholder="ESCRIBE PARA BUSCAR...">
+                <div class="input-with-clear">
+                    <input type="text" id="modal-input-busqueda" onkeyup="filtrarResultadosModal()" placeholder="ESCRIBE PARA BUSCAR...">
+                    <button type="button" class="clear-btn" onclick="limpiarInput('modal-input-busqueda'); filtrarResultadosModal();">&times;</button>
+                </div>
             </div>
             <div id="modal-lista-resultados" style="max-height: 200px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 6px; padding: 6px; background: #f9fafb; margin-bottom: 12px; font-size: 0.85rem;"></div>
             <div class="text-center">
@@ -398,6 +433,7 @@
         let html5QrCodeScanner = null;
         let modoEscanerOrigen = '';
         let modoModalActual = '';
+        let ventaEnEdicionOriginal = null; // Almacena el respaldo exacto por si se cancela la edición
 
         window.onload = function() {
             renderizarProductos();
@@ -469,8 +505,19 @@
             lector.readAsText(archivo);
         }
 
-        function limpiarInput(id) { document.getElementById(id).value = ''; document.getElementById(id).focus(); }
-        function limpiarProductoVenta() { document.getElementById('venta-producto-id').value = ''; document.getElementById('venta-producto-nombre').value = ''; document.getElementById('venta-barcode').value = ''; }
+        function limpiarInput(id) { 
+            const el = document.getElementById(id);
+            if(el) {
+                el.value = ''; 
+                el.focus();
+            }
+        }
+        
+        function limpiarProductoVenta() { 
+            document.getElementById('venta-producto-id').value = ''; 
+            document.getElementById('venta-producto-nombre').value = ''; 
+            document.getElementById('venta-barcode').value = ''; 
+        }
 
         function reproducirPitidoExito() {
             try {
@@ -503,16 +550,28 @@
         }
 
         function procesarCodigoEscaneado(codigo) {
-            if (modoEscanerOrigen === 'stock') { document.getElementById('prod-barcode').value = codigo; verificarBarcodeStock(codigo); }
-            else if (modoEscanerOrigen === 'venta') { document.getElementById('venta-barcode').value = codigo; verificarBarcodeVenta(codigo); }
+            if (modoEscanerOrigen === 'stock') { 
+                document.getElementById('prod-barcode').value = codigo; 
+                verificarBarcodeStock(codigo); 
+            } else if (modoEscanerOrigen === 'venta') { 
+                document.getElementById('venta-barcode').value = codigo; 
+                verificarBarcodeVenta(codigo); 
+            }
         }
 
         function verificarBarcodeStock(codigoForzado = null) {
             const barcode = codigoForzado || document.getElementById('prod-barcode').value.trim().toUpperCase();
             if (!barcode) return;
             const existente = productos.find(p => p.barcode && p.barcode.toUpperCase() === barcode);
-            if (existente) { reproducirPitidoExito(); editarProducto(existente.id); }
-            else { limpiarFormProducto(); document.getElementById('prod-barcode').value = barcode; document.getElementById('prod-nombre').focus(); }
+            if (existente) { 
+                reproducirPitidoExito(); 
+                editarProducto(existente.id); 
+            } else { 
+                limpiarFormProducto(); 
+                document.getElementById('prod-barcode').value = barcode; 
+                // Si no se encuentra, el cursor cae en la caja de texto Nombre de Producto
+                document.getElementById('prod-nombre').focus(); 
+            }
         }
 
         function verificarBarcodeVenta(codigoForzado = null) {
@@ -523,7 +582,13 @@
                 reproducirPitidoExito();
                 document.getElementById('venta-producto-id').value = prod.id;
                 document.getElementById('venta-producto-nombre').value = `${prod.name} (L ${prod.price.toFixed(2)})`;
-            } else { alert(`No se encontró producto con código: ${barcode}`); limpiarProductoVenta(); }
+                // Si la búsqueda es exitosa, el cursor cae en la caja de texto Cantidad
+                document.getElementById('venta-cantidad').focus();
+                document.getElementById('venta-cantidad').select();
+            } else { 
+                alert(`No se encontró producto con código: ${barcode}`); 
+                limpiarProductoVenta(); 
+            }
         }
 
         function abrirModalBusquedaStock() { modoModalActual = 'stock'; document.getElementById('modal-titulo').textContent = "BUSCAR PRODUCTO"; abrirModalGenerico(productos); }
@@ -568,6 +633,8 @@
                         document.getElementById('venta-producto-nombre').value = `${item.name} (L ${item.price.toFixed(2)})`;
                         document.getElementById('venta-barcode').value = item.barcode || '';
                         cerrarModalBusqueda();
+                        document.getElementById('venta-cantidad').focus();
+                        document.getElementById('venta-cantidad').select();
                     };
                 }
                 contenedor.appendChild(div);
@@ -824,6 +891,10 @@
         function cargarVentaParaEditar(id) {
             const v = ventas.find(item => item.id == id);
             if (!v) return;
+            
+            // Guardamos una copia exacta del estado original por si el usuario decide cancelar la edición
+            ventaEnEdicionOriginal = JSON.parse(JSON.stringify(v));
+
             carritoVenta = [];
             (v.items || []).forEach(i => carritoVenta.push({ productoId: i.productoId || Date.now(), name: i.name || i.nombre, precio: i.precio, cantidad: i.cantidad }));
             renderizarCarrito();
@@ -834,6 +905,7 @@
             document.getElementById('titulo-form-venta').innerHTML = `<i class="fa-solid fa-pen-to-square" style="color: #4f46e5;"></i> Editando Venta (ID: ${v.id})`;
             document.getElementById('btn-cancelar-edicion-venta').classList.remove('hidden');
             document.getElementById('btn-procesar-venta').textContent = "Actualizar Venta";
+            
             revertirEfectosVenta(v);
             ventas = ventas.filter(item => item.id != v.id);
             localStorage.setItem('hob_ventas', JSON.stringify(ventas));
@@ -842,11 +914,29 @@
         }
 
         function cancelarEdicionVenta() {
+            const editId = document.getElementById('editando-venta-id').value;
+            
+            // Si teníamos una venta original en edición y se cancela sin hacer cambios, la devolvemos intacta al historial
+            if (editId && ventaEnEdicionOriginal) {
+                // Reaplicamos los efectos en stock/crédito porque al iniciar la edición se habían revertido temporalmente
+                aplicarEfectosVenta(ventaEnEdicionOriginal);
+                ventas.push(ventaEnEdicionOriginal);
+                localStorage.setItem('hob_ventas', JSON.stringify(ventas));
+                renderizarProductos();
+                renderizarCreditos();
+                renderizarReportes();
+                renderizarVentas();
+            }
+
             document.getElementById('editando-venta-id').value = '';
+            ventaEnEdicionOriginal = null;
             document.getElementById('titulo-form-venta').innerHTML = `<i class="fa-solid fa-cart-plus" style="color: #4f46e5;"></i> Registrar Venta`;
             document.getElementById('btn-cancelar-edicion-venta').classList.add('hidden');
             document.getElementById('btn-procesar-venta').textContent = "Procesar Venta";
-            carritoVenta = []; renderizarCarrito(); document.getElementById('form-venta').reset(); limpiarProductoVenta();
+            carritoVenta = []; 
+            renderizarCarrito(); 
+            document.getElementById('form-venta').reset(); 
+            limpiarProductoVenta();
         }
 
         function revertirEfectosVenta(v) {
@@ -862,6 +952,21 @@
                 }
             }
             renderizarProductos(); renderizarCreditos(); renderizarReportes();
+        }
+
+        function aplicarEfectosVenta(v) {
+            if (v.items) {
+                v.items.forEach(i => { const p = productos.find(prod => prod.id == i.productoId); if (p) p.stock -= i.cantidad; });
+                localStorage.setItem('hob_productos', JSON.stringify(productos));
+            }
+            if (v.tipo === 'CREDITO') {
+                const cObj = clientes.find(c => c.nombre === v.cliente);
+                if (cObj) {
+                    let cr = creditos.find(x => x.clienteId == cObj.id);
+                    if (cr) { cr.saldo += v.total; } else { creditos.push({ clienteId: cObj.id, clienteNombre: cObj.nombre, saldo: v.total }); }
+                    localStorage.setItem('hob_creditos', JSON.stringify(creditos));
+                }
+            }
         }
 
         function eliminarVenta(id) {
