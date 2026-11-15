@@ -73,9 +73,9 @@
 
         /* Tablas tipo Excel horizontal con scroll */
         .table-container { width: 100%; overflow-x: auto; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; min-width: 750px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; min-width: 800px; }
         th { background-color: #f3f4f6; color: #374151; text-transform: uppercase; font-size: 0.7rem; padding: 10px; border-bottom: 2px solid #e5e7eb; white-space: nowrap; }
-        td { padding: 10px; border-bottom: 1px solid #e5e7eb; color: #4b5563; white-space: nowrap; }
+        td { padding: 10px; border-bottom: 1px solid #e5e7eb; color: #4b5563; vertical-align: top; }
         tr:hover { background-color: #f9fafb; }
 
         /* Modales */
@@ -444,7 +444,6 @@
         let ventaEnEdicionOriginal = null;
 
         window.onload = function() {
-            // Establecer fecha actual por defecto en el campo de fecha de venta
             document.getElementById('venta-fecha').value = new Date().toISOString().split('T')[0];
             renderizarProductos();
             renderizarClientes();
@@ -1022,17 +1021,18 @@ ${div}
             tbody.innerHTML = '';
             if (ventas.length === 0) { tbody.innerHTML = `<tr><td colspan="7" class="text-center" style="color: #9ca3af; padding: 20px; white-space: normal;">No hay ventas registradas.</td></tr>`; return; }
             ventas.slice().reverse().forEach(v => {
-                let prods = "", dets = "";
+                let prodsHtml = "";
+                let detsHtml = "";
                 if (v.items) {
-                    prods = v.items.map(i => i.name || i.nombre).join(', ');
-                    dets = v.items.map(i => `${i.cantidad} X L ${i.precio.toFixed(2)}`).join(' | ');
+                    prodsHtml = v.items.map(i => `<div style="padding: 2px 0;">• ${i.name || i.nombre}</div>`).join('');
+                    detsHtml = v.items.map(i => `<div style="padding: 2px 0;">${i.cantidad} x L ${i.precio.toFixed(2)}</div>`).join('');
                 }
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td style="white-space: nowrap;">${v.fecha}</td>
                     <td style="font-weight: 600; color: #1f2937;">${v.cliente}</td>
-                    <td>${prods}</td>
-                    <td>${dets}</td>
+                    <td>${prodsHtml}</td>
+                    <td>${detsHtml}</td>
                     <td><span class="badge ${v.tipo === 'CONTADO' ? 'badge-contado' : 'badge-credito'}">${v.tipo}</span></td>
                     <td style="font-weight: bold; color: #4f46e5;">L ${v.total.toFixed(2)}</td>
                     <td class="text-center" style="white-space: nowrap;">
