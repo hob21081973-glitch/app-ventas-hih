@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>App Ventas HIH</title>
-    <!-- Tailwind CSS -->
-    <script src="[https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4](https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4)"></script>
+    <!-- Tailwind CSS v3 (Versión estable y asegurada para carga local/offline) -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome para iconos -->
-    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Librería de Escáner de Código de Barras -->
-    <script src="[https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js](https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js)"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
     <!-- Librería para dibujar códigos de barras dinámicos -->
-    <script src="[https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js](https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js)"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <style>
         .tabs-container {
             display: flex;
@@ -335,7 +335,7 @@
                     </div>
                 </div>
 
-                <!-- HISTORIAL DE VENTAS Y TICKETS (ESTRUCTURA SOLICITADA) -->
+                <!-- HISTORIAL DE VENTAS Y TICKETS -->
                 <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 space-y-4">
                     <h3 class="text-lg font-bold text-gray-800 flex items-center">
                         <i class="fa-solid fa-list text-indigo-600 mr-2"></i> Historial de Ventas y Tickets
@@ -1058,7 +1058,6 @@
             const editId = document.getElementById('editando-venta-id').value;
 
             if (editId) {
-                // Si estamos editando una venta existente, la actualizamos
                 const ventaIndex = ventas.findIndex(v => v.id == editId);
                 if (ventaIndex !== -1) {
                     ventas[ventaIndex].items = [...carritoVenta];
@@ -1068,7 +1067,6 @@
                 }
                 cancelarEdicionVenta();
             } else {
-                // Venta nueva
                 const nuevaVenta = {
                     id: Date.now(),
                     fecha: new Date().toISOString().split('T')[0],
@@ -1107,12 +1105,10 @@
             alert('¡Venta procesada exitosamente!');
         }
 
-        // --- FUNCIÓN EDITAR VENTA (LLEVA A LA PESTAÑA VENTAS) ---
         function cargarVentaParaEditar(ventaId) {
             const v = ventas.find(item => item.id == ventaId);
             if (!v) return;
 
-            // Rellenar el carrito con los ítems de esta venta
             carritoVenta = [];
             if (v.items && Array.isArray(v.items)) {
                 v.items.forEach(i => {
@@ -1134,10 +1130,8 @@
 
             renderizarCarrito();
 
-            // Configurar tipo de pago
             document.getElementById('venta-tipo').value = v.tipo || 'CONTADO';
             
-            // Buscar y seleccionar el cliente en el select
             const selectCli = document.getElementById('venta-cliente');
             let encontrado = false;
             for (let i = 0; i < selectCli.options.length; i++) {
@@ -1149,19 +1143,16 @@
             }
             if (!encontrado) selectCli.value = "";
 
-            // Marcar que estamos editando esta venta específica
             document.getElementById('editando-venta-id').value = v.id;
             document.getElementById('titulo-form-venta').innerHTML = `<i class="fa-solid fa-pen-to-square text-indigo-600 mr-2"></i> Editando Venta (ID: ${v.id}) <span class="text-xs text-gray-500 ml-2">(Fecha original: ${v.fecha})</span>`;
             document.getElementById('btn-cancelar-edicion-venta').classList.remove('hidden');
             document.getElementById('btn-procesar-venta').textContent = "Actualizar Venta en Historial";
 
-            // Eliminar la venta anterior del stock y créditos temporalmente para que al re-procesarla no duplique cálculos
             revertirEfectosVenta(v);
             ventas = ventas.filter(item => item.id != v.id);
             localStorage.setItem('hob_ventas', JSON.stringify(ventas));
             renderizarVentas();
 
-            // Cambiar a la pestaña de ventas
             cambiarPestana('ventas', 2);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -1246,7 +1237,6 @@
 
             const lineaDivisoria = "--------------------------------";
 
-            // Usamos el bloque de código triple invertido para obligar a WhatsApp a usar fuente monoespaciada pequeña
             const textoTicket = 
 `\`\`\`
 TICKET DE PEDIDO - HOB
@@ -1262,7 +1252,7 @@ ${lineaDivisoria}
 ¡Gracias por su preferencia!
 \`\`\``;
 
-            window.open(`[https://api.whatsapp.com/send?text=$](https://api.whatsapp.com/send?text=$){encodeURIComponent(textoTicket)}`, '_blank');
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(textoTicket)}`, '_blank');
         }
 
         function renderizarVentas() {
