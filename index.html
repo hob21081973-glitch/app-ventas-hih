@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>App Ventas HIH</title>
     <!-- Tailwind CSS -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="[https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4](https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4)"></script>
     <!-- FontAwesome para iconos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)">
     <!-- Librería de Escáner de Código de Barras -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js](https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js)"></script>
     <!-- Librería para dibujar códigos de barras dinámicos -->
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="[https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js](https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js)"></script>
     <style>
         .tabs-container {
             display: flex;
@@ -81,7 +81,6 @@
                     <form id="form-producto" onsubmit="guardarProducto(event)" class="space-y-4">
                         <input type="hidden" id="producto-id">
                         
-                        <!-- CÓDIGO DE BARRA -->
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Código de Barra</label>
                             <div class="flex gap-2">
@@ -92,7 +91,6 @@
                             </div>
                         </div>
 
-                        <!-- NOMBRE DEL PRODUCTO -->
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre del Producto</label>
                             <div class="relative">
@@ -208,14 +206,17 @@
             <!-- ================= 3. PESTAÑA VENTAS ================= -->
             <section id="pestana-ventas" class="tab-pane w-full space-y-6">
                 <div class="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow-md border border-gray-100 space-y-4">
-                    <h2 class="text-xl font-bold text-gray-800 border-b pb-2 flex items-center">
-                        <i class="fa-solid fa-cart-plus text-indigo-600 mr-2"></i> Registrar Nueva Venta
-                    </h2>
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h2 id="titulo-form-venta" class="text-xl font-bold text-gray-800 flex items-center">
+                            <i class="fa-solid fa-cart-plus text-indigo-600 mr-2"></i> Registrar Nueva Venta
+                        </h2>
+                        <button type="button" id="btn-cancelar-edicion-venta" onclick="cancelarEdicionVenta()" class="hidden bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs px-3 py-1.5 rounded-lg font-medium transition">Cancelar Edición</button>
+                    </div>
                     
                     <form id="form-venta" onsubmit="procesarVentaGeneral(event)" class="space-y-4">
                         <input type="hidden" id="venta-producto-id">
+                        <input type="hidden" id="editando-venta-id" value="">
                         
-                        <!-- CÓDIGO DE BARRA CON ESCÁNER EN VENTAS -->
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Código de Barra</label>
                             <div class="flex gap-2">
@@ -226,7 +227,6 @@
                             </div>
                         </div>
 
-                        <!-- NOMBRE DEL PRODUCTO CON LUPA, X Y SELECTOR EN VENTAS -->
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre del Producto</label>
                             <div class="relative">
@@ -278,7 +278,7 @@
                             <span id="venta-total-texto" class="text-2xl font-bold text-indigo-700">L 0.00</span>
                         </div>
 
-                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-lg shadow transition">
+                        <button type="submit" id="btn-procesar-venta" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-lg shadow transition">
                             Procesar Venta
                         </button>
                     </form>
@@ -335,6 +335,7 @@
                     </div>
                 </div>
 
+                <!-- HISTORIAL DE VENTAS Y TICKETS (ESTRUCTURA SOLICITADA) -->
                 <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 space-y-4">
                     <h3 class="text-lg font-bold text-gray-800 flex items-center">
                         <i class="fa-solid fa-list text-indigo-600 mr-2"></i> Historial de Ventas y Tickets
@@ -343,12 +344,13 @@
                         <table class="w-full text-left border-collapse text-sm">
                             <thead>
                                 <tr class="bg-gray-100 text-gray-700 text-xs uppercase border-b">
-                                    <th class="py-3 px-4">Fecha</th>
-                                    <th class="py-3 px-4">Productos</th>
-                                    <th class="py-3 px-4">Cliente</th>
-                                    <th class="py-3 px-4">Tipo</th>
-                                    <th class="py-3 px-4">Total</th>
-                                    <th class="py-3 px-4 text-center">Acciones (WhatsApp / Editar / Borrar)</th>
+                                    <th class="py-3 px-3">Fecha</th>
+                                    <th class="py-3 px-3">Nombre de Cliente</th>
+                                    <th class="py-3 px-3">Nombre del Producto</th>
+                                    <th class="py-3 px-3">Cant. X Precio Unitario</th>
+                                    <th class="py-3 px-3">Tipo</th>
+                                    <th class="py-3 px-3">Total</th>
+                                    <th class="py-3 px-3 text-center">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="tabla-ventas" class="divide-y divide-gray-200">
@@ -372,37 +374,6 @@
             </div>
             <div class="flex justify-end pt-2">
                 <button type="button" onclick="cerrarModalBusqueda()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition">Cerrar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ================= MODAL EDITAR VENTA ================= -->
-    <div id="modal-editar-venta" class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden justify-center items-center z-50 p-4">
-        <div class="bg-white p-6 rounded-xl shadow-xl max-w-md w-full space-y-4">
-            <h3 class="text-lg font-bold text-gray-800 border-b pb-2 flex items-center">
-                <i class="fa-solid fa-pen text-indigo-600 mr-2"></i> Editar Fecha y Datos de Venta
-            </h3>
-            <input type="hidden" id="edit-venta-id">
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Fecha de Venta</label>
-                <input type="date" id="edit-venta-fecha" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
-            </div>
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Cliente</label>
-                <select id="edit-venta-cliente" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm bg-white">
-                    <option value="GENERAL">GENERAL</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Tipo de Pago</label>
-                <select id="edit-venta-tipo" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm bg-white">
-                    <option value="CONTADO">CONTADO</option>
-                    <option value="CREDITO">CRÉDITO</option>
-                </select>
-            </div>
-            <div class="flex justify-end gap-2 pt-2">
-                <button type="button" onclick="guardarEdicionVenta()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">Guardar Cambios</button>
-                <button type="button" onclick="cerrarModalEditarVenta()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition">Cancelar</button>
             </div>
         </div>
     </div>
@@ -971,15 +942,8 @@
         // --- VENTAS & CARRITO ---
         function poblarSelectoresVenta() {
             const selectCli = document.getElementById('venta-cliente');
-            const selectEditCli = document.getElementById('edit-venta-cliente');
-            
-            const opcionesCli = '<option value="GENERAL">GENERAL</option>' +
-                clientes.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
-            
             selectCli.innerHTML = '<option value="">GENERAL (CONTADO)</option>' +
                 clientes.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
-            
-            selectEditCli.innerHTML = opcionesCli;
         }
 
         function agregarAlCarrito() {
@@ -1066,7 +1030,12 @@
 
             const tipo = document.getElementById('venta-tipo').value;
             const cliId = document.getElementById('venta-cliente').value;
-            const cli = clientes.find(c => c.id == cliId);
+            let nombreClienteFinal = 'GENERAL';
+            
+            if (cliId) {
+                const cli = clientes.find(c => c.id == cliId);
+                if (cli) nombreClienteFinal = cli.nombre;
+            }
 
             if (tipo === 'CREDITO' && !cliId) {
                 alert('Debes seleccionar un cliente para ventas a crédito.');
@@ -1086,26 +1055,44 @@
 
             localStorage.setItem('hob_productos', JSON.stringify(productos));
 
-            const nuevaVenta = {
-                id: Date.now(),
-                fecha: new Date().toISOString().split('T')[0],
-                items: [...carritoVenta],
-                cliente: cli ? cli.nombre : 'GENERAL',
-                tipo,
-                total: totalVenta
-            };
+            const editId = document.getElementById('editando-venta-id').value;
 
-            ventas.push(nuevaVenta);
+            if (editId) {
+                // Si estamos editando una venta existente, la actualizamos
+                const ventaIndex = ventas.findIndex(v => v.id == editId);
+                if (ventaIndex !== -1) {
+                    ventas[ventaIndex].items = [...carritoVenta];
+                    ventas[ventaIndex].cliente = nombreClienteFinal;
+                    ventas[ventaIndex].tipo = tipo;
+                    ventas[ventaIndex].total = totalVenta;
+                }
+                cancelarEdicionVenta();
+            } else {
+                // Venta nueva
+                const nuevaVenta = {
+                    id: Date.now(),
+                    fecha: new Date().toISOString().split('T')[0],
+                    items: [...carritoVenta],
+                    cliente: nombreClienteFinal,
+                    tipo,
+                    total: totalVenta
+                };
+                ventas.push(nuevaVenta);
+            }
+
             localStorage.setItem('hob_ventas', JSON.stringify(ventas));
 
-            if (tipo === 'CREDITO' && cli) {
-                const credIdx = creditos.findIndex(cr => cr.clienteId == cli.id);
-                if (credIdx !== -1) {
-                    creditos[credIdx].saldo += totalVenta;
-                } else {
-                    creditos.push({ clienteId: cli.id, clienteNombre: cli.nombre, saldo: totalVenta });
+            if (tipo === 'CREDITO' && cliId) {
+                const cliObj = clientes.find(c => c.id == cliId);
+                if (cliObj) {
+                    const credIdx = creditos.findIndex(cr => cr.clienteId == cliObj.id);
+                    if (credIdx !== -1) {
+                        creditos[credIdx].saldo += totalVenta;
+                    } else {
+                        creditos.push({ clienteId: cliObj.id, clienteNombre: cliObj.nombre, saldo: totalVenta });
+                    }
+                    localStorage.setItem('hob_creditos', JSON.stringify(creditos));
                 }
-                localStorage.setItem('hob_creditos', JSON.stringify(creditos));
             }
 
             carritoVenta = [];
@@ -1120,6 +1107,100 @@
             alert('¡Venta procesada exitosamente!');
         }
 
+        // --- FUNCIÓN EDITAR VENTA (LLEVA A LA PESTAÑA VENTAS) ---
+        function cargarVentaParaEditar(ventaId) {
+            const v = ventas.find(item => item.id == ventaId);
+            if (!v) return;
+
+            // Rellenar el carrito con los ítems de esta venta
+            carritoVenta = [];
+            if (v.items && Array.isArray(v.items)) {
+                v.items.forEach(i => {
+                    carritoVenta.push({
+                        productoId: i.productoId || Date.now(),
+                        nombre: i.nombre,
+                        precio: i.precio,
+                        cantidad: i.cantidad
+                    });
+                });
+            } else {
+                carritoVenta.push({
+                    productoId: Date.now(),
+                    nombre: v.producto || 'PRODUCTO',
+                    precio: v.total,
+                    cantidad: 1
+                });
+            }
+
+            renderizarCarrito();
+
+            // Configurar tipo de pago
+            document.getElementById('venta-tipo').value = v.tipo || 'CONTADO';
+            
+            // Buscar y seleccionar el cliente en el select
+            const selectCli = document.getElementById('venta-cliente');
+            let encontrado = false;
+            for (let i = 0; i < selectCli.options.length; i++) {
+                if (selectCli.options[i].text === v.cliente) {
+                    selectCli.selectedIndex = i;
+                    encontrado = true;
+                    break;
+                }
+            }
+            if (!encontrado) selectCli.value = "";
+
+            // Marcar que estamos editando esta venta específica
+            document.getElementById('editando-venta-id').value = v.id;
+            document.getElementById('titulo-form-venta').innerHTML = `<i class="fa-solid fa-pen-to-square text-indigo-600 mr-2"></i> Editando Venta (ID: ${v.id}) <span class="text-xs text-gray-500 ml-2">(Fecha original: ${v.fecha})</span>`;
+            document.getElementById('btn-cancelar-edicion-venta').classList.remove('hidden');
+            document.getElementById('btn-procesar-venta').textContent = "Actualizar Venta en Historial";
+
+            // Eliminar la venta anterior del stock y créditos temporalmente para que al re-procesarla no duplique cálculos
+            revertirEfectosVenta(v);
+            ventas = ventas.filter(item => item.id != v.id);
+            localStorage.setItem('hob_ventas', JSON.stringify(ventas));
+            renderizarVentas();
+
+            // Cambiar a la pestaña de ventas
+            cambiarPestana('ventas', 2);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelarEdicionVenta() {
+            document.getElementById('editando-venta-id').value = '';
+            document.getElementById('titulo-form-venta').innerHTML = `<i class="fa-solid fa-cart-plus text-indigo-600 mr-2"></i> Registrar Nueva Venta`;
+            document.getElementById('btn-cancelar-edicion-venta').classList.add('hidden');
+            document.getElementById('btn-procesar-venta').textContent = "Procesar Venta";
+            carritoVenta = [];
+            renderizarCarrito();
+            document.getElementById('form-venta').reset();
+            limpiarProductoVenta();
+        }
+
+        function revertirEfectosVenta(venta) {
+            if (venta.items && Array.isArray(venta.items)) {
+                venta.items.forEach(item => {
+                    const prod = productos.find(p => p.id == item.productoId);
+                    if (prod) prod.stock += item.cantidad;
+                });
+                localStorage.setItem('hob_productos', JSON.stringify(productos));
+            }
+            if (venta.tipo === 'CREDITO') {
+                const cliObj = clientes.find(c => c.nombre === venta.cliente);
+                if (cliObj) {
+                    const cred = creditos.find(cr => cr.clienteId == cliObj.id);
+                    if (cred) {
+                        cred.saldo -= venta.total;
+                        if (cred.saldo <= 0) creditos = creditos.filter(cr => cr.clienteId != cliObj.id);
+                        localStorage.setItem('hob_creditos', JSON.stringify(creditos));
+                    }
+                }
+            }
+            renderizarProductos();
+            renderizarCreditos();
+            renderizarReportes();
+        }
+
         function eliminarVenta(ventaId) {
             if (!confirm('¿Deseas eliminar esta venta? Se devolverá el stock al inventario y se descontará del crédito (si aplica).')) {
                 return;
@@ -1129,30 +1210,7 @@
             if (ventaIndex === -1) return;
             const venta = ventas[ventaIndex];
 
-            if (venta.items && Array.isArray(venta.items)) {
-                venta.items.forEach(item => {
-                    const prod = productos.find(p => p.id == item.productoId);
-                    if (prod) {
-                        prod.stock += item.cantidad;
-                    }
-                });
-                localStorage.setItem('hob_productos', JSON.stringify(productos));
-            }
-
-            if (venta.tipo === 'CREDITO') {
-                const cli = clientes.find(c => c.nombre === venta.cliente);
-                if (cli) {
-                    const cred = creditos.find(cr => cr.clienteId == cli.id);
-                    if (cred) {
-                        cred.saldo -= venta.total;
-                        if (cred.saldo <= 0) {
-                            creditos = creditos.filter(cr => cr.clienteId != cli.id);
-                        }
-                        localStorage.setItem('hob_creditos', JSON.stringify(creditos));
-                    }
-                }
-            }
-
+            revertirEfectosVenta(venta);
             ventas.splice(ventaIndex, 1);
             localStorage.setItem('hob_ventas', JSON.stringify(ventas));
 
@@ -1161,46 +1219,6 @@
             renderizarCreditos();
             renderizarReportes();
             alert('Venta eliminada y stock revertido con éxito.');
-        }
-
-        // --- MODAL EDITAR VENTA ---
-        function abrirModalEditarVenta(ventaId) {
-            const v = ventas.find(item => item.id == ventaId);
-            if (!v) return;
-
-            document.getElementById('edit-venta-id').value = v.id;
-            document.getElementById('edit-venta-fecha').value = v.fecha;
-            document.getElementById('edit-venta-cliente').value = v.cliente || 'GENERAL';
-            document.getElementById('edit-venta-tipo').value = v.tipo || 'CONTADO';
-
-            const modal = document.getElementById('modal-editar-venta');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function cerrarModalEditarVenta() {
-            const modal = document.getElementById('modal-editar-venta');
-            modal.classList.remove('flex');
-            modal.classList.add('hidden');
-        }
-
-        function guardarEdicionVenta() {
-            const id = document.getElementById('edit-venta-id').value;
-            const nuevaFecha = document.getElementById('edit-venta-fecha').value;
-            const nuevoCliente = document.getElementById('edit-venta-cliente').value;
-            const nuevoTipo = document.getElementById('edit-venta-tipo').value;
-
-            const v = ventas.find(item => item.id == id);
-            if (v && nuevaFecha) {
-                v.fecha = nuevaFecha;
-                v.cliente = nuevoCliente;
-                v.tipo = nuevoTipo;
-
-                localStorage.setItem('hob_ventas', JSON.stringify(ventas));
-                renderizarVentas();
-                cerrarModalEditarVenta();
-                alert('¡Venta actualizada con éxito!');
-            }
         }
 
         function enviarTicketWhatsApp(ventaId) {
@@ -1226,12 +1244,12 @@
                 );
             }
 
-            // Línea divisoria dinámica que se ajusta perfectamente (aprox 32 guiones limpios)
             const lineaDivisoria = "--------------------------------";
 
-            // Usamos un bloque de texto comprimido para reducir el tamaño visual general en WhatsApp
+            // Usamos el bloque de código triple invertido para obligar a WhatsApp a usar fuente monoespaciada pequeña
             const textoTicket = 
-`*TICKET DE PEDIDO - HOB*
+`\`\`\`
+TICKET DE PEDIDO - HOB
 ${lineaDivisoria}
 Fecha: ${v.fecha}
 Cliente: ${v.cliente}
@@ -1239,11 +1257,12 @@ Tipo: ${v.tipo}
 ${lineaDivisoria}
 ${lineasProductos.join('\n' + lineaDivisoria + '\n')}
 ${lineaDivisoria}
-*TOTAL A PAGAR: L ${v.total.toFixed(2)}*
+TOTAL A PAGAR: L ${v.total.toFixed(2)}
 ${lineaDivisoria}
-¡Gracias por su preferencia!`;
+¡Gracias por su preferencia!
+\`\`\``;
 
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(textoTicket)}`, '_blank');
+            window.open(`[https://api.whatsapp.com/send?text=$](https://api.whatsapp.com/send?text=$){encodeURIComponent(textoTicket)}`, '_blank');
         }
 
         function renderizarVentas() {
@@ -1251,36 +1270,39 @@ ${lineaDivisoria}
             tbody.innerHTML = '';
 
             if (ventas.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-gray-400 py-6">No hay ventas registradas.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-gray-400 py-6">No hay ventas registradas.</td></tr>`;
                 return;
             }
 
             ventas.slice().reverse().forEach(v => {
-                let productosTexto = "";
+                let productosNombres = "";
+                let detallesCantPrecio = "";
+
                 if (v.items && Array.isArray(v.items)) {
-                    productosTexto = v.items.map(i => `${i.cantidad}X ${i.nombre}`).join(', ');
+                    productosNombres = v.items.map(i => i.nombre).join(', ');
+                    detallesCantPrecio = v.items.map(i => `${i.cantidad} X L ${i.precio.toFixed(2)}`).join(' | ');
                 } else {
-                    productosTexto = v.producto;
+                    productosNombres = v.producto || 'PRODUCTO';
+                    detallesCantPrecio = `1 X L ${v.total.toFixed(2)}`;
                 }
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50 border-b";
+                tr.className = "hover:bg-gray-50 border-b text-xs md:text-sm";
                 tr.innerHTML = `
-                    <td class="py-3 px-4 text-gray-600 text-xs flex items-center gap-2">
-                        <span>${v.fecha}</span>
-                        <button onclick="abrirModalEditarVenta(${v.id})" class="text-indigo-600 hover:text-indigo-800 transition" title="Editar Fecha y Datos">
+                    <td class="py-3 px-3 text-gray-600 whitespace-nowrap">${v.fecha}</td>
+                    <td class="py-3 px-3 font-semibold text-gray-800">${v.cliente}</td>
+                    <td class="py-3 px-3 text-gray-700">${productosNombres}</td>
+                    <td class="py-3 px-3 text-gray-600">${detallesCantPrecio}</td>
+                    <td class="py-3 px-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold ${v.tipo === 'CONTADO' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${v.tipo}</span></td>
+                    <td class="py-3 px-3 font-bold text-indigo-600">L ${v.total.toFixed(2)}</td>
+                    <td class="py-3 px-3 text-center space-x-2 whitespace-nowrap">
+                        <button onclick="enviarTicketWhatsApp(${v.id})" class="text-emerald-600 hover:text-emerald-800 transition text-base" title="Enviar Ticket por WhatsApp">
+                            <i class="fa-brands fa-whatsapp"></i>
+                        </button>
+                        <button onclick="cargarVentaParaEditar(${v.id})" class="text-indigo-600 hover:text-indigo-800 transition text-base" title="Editar Venta en Pestaña Ventas">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
-                    </td>
-                    <td class="py-3 px-4 font-semibold text-gray-800">${productosTexto}</td>
-                    <td class="py-3 px-4 text-gray-600">${v.cliente}</td>
-                    <td class="py-3 px-4"><span class="px-2 py-1 rounded-full text-xs font-bold ${v.tipo === 'CONTADO' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${v.tipo}</span></td>
-                    <td class="py-3 px-4 font-bold text-indigo-600">L ${v.total.toFixed(2)}</td>
-                    <td class="py-3 px-4 text-center space-x-3">
-                        <button onclick="enviarTicketWhatsApp(${v.id})" class="text-emerald-600 hover:text-emerald-800 transition" title="Enviar Ticket por WhatsApp">
-                            <i class="fa-brands fa-whatsapp text-lg"></i>
-                        </button>
-                        <button onclick="eliminarVenta(${v.id})" class="text-rose-600 hover:text-rose-800 transition" title="Eliminar Venta (Devolver Stock)">
+                        <button onclick="eliminarVenta(${v.id})" class="text-rose-600 hover:text-rose-800 transition text-base" title="Eliminar Venta">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </td>
