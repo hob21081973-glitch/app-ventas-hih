@@ -159,7 +159,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Teléfono</label>
-                                <input type="text" id="cli-telefono" placeholder="9999-9999" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                                <input type="text" id="cli-telefono" placeholder="0000-0000" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Límite de Crédito (L)</label>
@@ -348,7 +348,7 @@
                                     <th class="py-3 px-4">Cliente</th>
                                     <th class="py-3 px-4">Tipo</th>
                                     <th class="py-3 px-4">Total</th>
-                                    <th class="py-3 px-4 text-center">Acciones (WhatsApp / Borrar)</th>
+                                    <th class="py-3 px-4 text-center">Acciones (WhatsApp / Editar / Borrar)</th>
                                 </tr>
                             </thead>
                             <tbody id="tabla-ventas" class="divide-y divide-gray-200">
@@ -372,6 +372,37 @@
             </div>
             <div class="flex justify-end pt-2">
                 <button type="button" onclick="cerrarModalBusqueda()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL EDITAR VENTA ================= -->
+    <div id="modal-editar-venta" class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden justify-center items-center z-50 p-4">
+        <div class="bg-white p-6 rounded-xl shadow-xl max-w-md w-full space-y-4">
+            <h3 class="text-lg font-bold text-gray-800 border-b pb-2 flex items-center">
+                <i class="fa-solid fa-pen text-indigo-600 mr-2"></i> Editar Fecha y Datos de Venta
+            </h3>
+            <input type="hidden" id="edit-venta-id">
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Fecha de Venta</label>
+                <input type="date" id="edit-venta-fecha" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Cliente</label>
+                <select id="edit-venta-cliente" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm bg-white">
+                    <option value="GENERAL">GENERAL</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Tipo de Pago</label>
+                <select id="edit-venta-tipo" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm bg-white">
+                    <option value="CONTADO">CONTADO</option>
+                    <option value="CREDITO">CRÉDITO</option>
+                </select>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" onclick="guardarEdicionVenta()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">Guardar Cambios</button>
+                <button type="button" onclick="cerrarModalEditarVenta()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition">Cancelar</button>
             </div>
         </div>
     </div>
@@ -940,8 +971,15 @@
         // --- VENTAS & CARRITO ---
         function poblarSelectoresVenta() {
             const selectCli = document.getElementById('venta-cliente');
+            const selectEditCli = document.getElementById('edit-venta-cliente');
+            
+            const opcionesCli = '<option value="GENERAL">GENERAL</option>' +
+                clientes.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
+            
             selectCli.innerHTML = '<option value="">GENERAL (CONTADO)</option>' +
                 clientes.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
+            
+            selectEditCli.innerHTML = opcionesCli;
         }
 
         function agregarAlCarrito() {
@@ -1125,6 +1163,46 @@
             alert('Venta eliminada y stock revertido con éxito.');
         }
 
+        // --- MODAL EDITAR VENTA ---
+        function abrirModalEditarVenta(ventaId) {
+            const v = ventas.find(item => item.id == ventaId);
+            if (!v) return;
+
+            document.getElementById('edit-venta-id').value = v.id;
+            document.getElementById('edit-venta-fecha').value = v.fecha;
+            document.getElementById('edit-venta-cliente').value = v.cliente || 'GENERAL';
+            document.getElementById('edit-venta-tipo').value = v.tipo || 'CONTADO';
+
+            const modal = document.getElementById('modal-editar-venta');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function cerrarModalEditarVenta() {
+            const modal = document.getElementById('modal-editar-venta');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        function guardarEdicionVenta() {
+            const id = document.getElementById('edit-venta-id').value;
+            const nuevaFecha = document.getElementById('edit-venta-fecha').value;
+            const nuevoCliente = document.getElementById('edit-venta-cliente').value;
+            const nuevoTipo = document.getElementById('edit-venta-tipo').value;
+
+            const v = ventas.find(item => item.id == id);
+            if (v && nuevaFecha) {
+                v.fecha = nuevaFecha;
+                v.cliente = nuevoCliente;
+                v.tipo = nuevoTipo;
+
+                localStorage.setItem('hob_ventas', JSON.stringify(ventas));
+                renderizarVentas();
+                cerrarModalEditarVenta();
+                alert('¡Venta actualizada con éxito!');
+            }
+        }
+
         function enviarTicketWhatsApp(ventaId) {
             const v = ventas.find(item => item.id == ventaId);
             if (!v) return;
@@ -1132,25 +1210,38 @@
             let lineasProductos = [];
             if (v.items && Array.isArray(v.items)) {
                 v.items.forEach(i => {
-                    lineasProductos.push(`${i.cantidad}X ${i.nombre} ........ L ${(i.precio * i.cantidad).toFixed(2)}`);
+                    const subtotal = i.precio * i.cantidad;
+                    lineasProductos.push(
+                        `${i.nombre}\n` +
+                        `Cantidad: ${i.cantidad}\n` +
+                        `L ${i.precio.toFixed(2)} x ${i.cantidad} = L ${subtotal.toFixed(2)}`
+                    );
                 });
             } else {
-                lineasProductos.push(`1X ${v.producto} ........ L ${v.total.toFixed(2)}`);
+                const subtotal = v.total;
+                lineasProductos.push(
+                    `${v.producto || 'PRODUCTO'}\n` +
+                    `Cantidad: 1\n` +
+                    `L ${subtotal.toFixed(2)} x 1 = L ${subtotal.toFixed(2)}`
+                );
             }
 
+            // Línea divisoria dinámica que se ajusta perfectamente (aprox 32 guiones limpios)
+            const lineaDivisoria = "--------------------------------";
+
+            // Usamos un bloque de texto comprimido para reducir el tamaño visual general en WhatsApp
             const textoTicket = 
-`TICKET DE PEDIDO - App Ventas HIH
-------------------------------------
-FECHA: ${v.fecha}
-CLIENTE: ${v.cliente}
-TIPO: ${v.tipo}
-------------------------------------
-CANT. PRODUCTO               VALOR
-${lineasProductos.join('\n')}
-------------------------------------
-TOTAL A PAGAR: L ${v.total.toFixed(2)}
-------------------------------------
-¡GRACIAS POR SU PREFERENCIA!`;
+`*TICKET DE PEDIDO - HOB*
+${lineaDivisoria}
+Fecha: ${v.fecha}
+Cliente: ${v.cliente}
+Tipo: ${v.tipo}
+${lineaDivisoria}
+${lineasProductos.join('\n' + lineaDivisoria + '\n')}
+${lineaDivisoria}
+*TOTAL A PAGAR: L ${v.total.toFixed(2)}*
+${lineaDivisoria}
+¡Gracias por su preferencia!`;
 
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(textoTicket)}`, '_blank');
         }
@@ -1175,7 +1266,12 @@ TOTAL A PAGAR: L ${v.total.toFixed(2)}
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-gray-50 border-b";
                 tr.innerHTML = `
-                    <td class="py-3 px-4 text-gray-600 text-xs">${v.fecha}</td>
+                    <td class="py-3 px-4 text-gray-600 text-xs flex items-center gap-2">
+                        <span>${v.fecha}</span>
+                        <button onclick="abrirModalEditarVenta(${v.id})" class="text-indigo-600 hover:text-indigo-800 transition" title="Editar Fecha y Datos">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                    </td>
                     <td class="py-3 px-4 font-semibold text-gray-800">${productosTexto}</td>
                     <td class="py-3 px-4 text-gray-600">${v.cliente}</td>
                     <td class="py-3 px-4"><span class="px-2 py-1 rounded-full text-xs font-bold ${v.tipo === 'CONTADO' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${v.tipo}</span></td>
