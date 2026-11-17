@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Ventas HIH</title>
+    <title>Ventas HIH</title>
     <!-- FontAwesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Librería de Escáner de Código de Barras -->
@@ -102,7 +102,7 @@
         <div class="header-content">
             <div class="logo-area">
                 <i class="fa-solid fa-boxes-stacked"></i>
-                <h1>App Ventas HIH</h1>
+                <h1>Ventas HIH</h1>
             </div>
             <nav>
                 <button onclick="cambiarPestana('stock')" id="nav-stock" class="active"><i class="fa-solid fa-box"></i> Stock</button>
@@ -425,7 +425,7 @@
     </div>
 
     <footer style="text-align: center; padding: 12px; font-size: 0.75rem; color: #6b7280; background: white; border-top: 1px solid #e5e7eb; margin-top: auto;">
-        App Ventas HIH &copy; 2026 - Gestión de Ventas y Créditos (L)
+        Ventas HIH &copy; 2026 - Gestión de Ventas y Créditos (L)
     </footer>
 
     <!-- Script de Funcionalidad -->
@@ -473,7 +473,7 @@
         }
 
         function exportarRespaldo() {
-            const datosRespaldo = { fechaRespaldo: new Date().toISOString(), app: 'App Ventas HIH', productos, clientes, ventas, creditos };
+            const datosRespaldo = { fechaRespaldo: new Date().toISOString(), app: 'Ventas HIH', productos, clientes, ventas, creditos };
             const blob = new Blob([JSON.stringify(datosRespaldo, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const enlace = document.createElement('a');
