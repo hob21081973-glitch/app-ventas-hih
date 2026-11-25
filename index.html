@@ -149,14 +149,18 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Imagen del Producto (Enlace Web / Automático)</label>
-                        <div style="display: flex; gap: 10px; align-items: center;">
+                        <label>Imagen del Producto (Enlace Web o Foto)</label>
+                        <div style="display: flex; gap: 8px; align-items: center;">
                             <img id="preview-prod-imagen" src="" alt="Vista previa" class="prod-thumb hidden">
                             <div id="placeholder-prod-imagen" class="prod-thumb-placeholder"><i class="fa-solid fa-image"></i></div>
                             <div class="input-with-clear" style="flex-grow: 1;">
-                                <input type="url" id="prod-imagen" oninput="actualizarVistaPreviaImagen()" placeholder="https://... (Se llena solo al buscar en web)" style="text-transform: none; font-size: 0.8rem;">
+                                <input type="text" id="prod-imagen" oninput="actualizarVistaPreviaImagen()" placeholder="https://... o sube una foto" style="text-transform: none; font-size: 0.8rem;">
                                 <button type="button" class="clear-btn" onclick="limpiarInput('prod-imagen'); actualizarVistaPreviaImagen();">&times;</button>
                             </div>
+                            <label class="btn btn-secondary" style="width: auto; padding: 8px 10px; margin: 0; cursor: pointer;" title="Subir foto">
+                                <i class="fa-solid fa-camera"></i>
+                                <input type="file" accept="image/*" onchange="cargarImagenLocal(event)" class="hidden">
+                            </label>
                         </div>
                     </div>
 
@@ -493,6 +497,12 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        function fetchConTimeout(url, ms = 5000) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), ms);
+            return fetch(url, { signal: controller.signal }).finally(() => clearTimeout(timer));
+        }
+
         // --- BÚSQUEDA EN LA WEB POR CÓDIGO DE BARRAS ---
         async function buscarProductoEnWeb(codigoForzado = null) {
             const barcode = (codigoForzado || document.getElementById('prod-barcode').value).trim();
@@ -505,64 +515,53 @@
             }
 
             estadoEl.style.color = '#0284c7';
-            estadoEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Buscando producto e imagen en internet...';
+            estadoEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Consultando bases públicas...';
             btnWeb.disabled = true;
 
+            let errorDeRed = false;
+
             try {
-                // 1. Intentar con Open Food Facts (Alimentos/Bebidas)
-                let res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
-                let data = await res.json();
-
-                if (data.status === 1 && data.product) {
-                    const nombre = data.product.product_name_es || data.product.product_name || '';
-                    const marca = data.product.brands ? `${data.product.brands} ` : '';
-                    const imagen = data.product.image_front_small_url || data.product.image_url || '';
-                    
-                    if (nombre) {
-                        aplicarDatosWeb(`${marca}${nombre}`, imagen);
-                        return;
+                // 1. Open Food Facts
+                try {
+                    const res = await fetchConTimeout(`https://world.openfoodfacts.org/api/v0/product/${encodeURIComponent(barcode)}.json`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.status === 1 && data.product) {
+                            const nombre = data.product.product_name_es || data.product.product_name || '';
+                            const marca = data.product.brands ? `${data.product.brands} ` : '';
+                            const imagen = data.product.image_front_small_url || data.product.image_url || '';
+                            if (nombre) {
+                                aplicarDatosWeb(`${marca}${nombre}`, imagen);
+                                return;
+                            }
+                        }
                     }
-                }
+                } catch (e) { errorDeRed = true; }
 
-                // 2. Intentar con Open Beauty Facts (Cosméticos / Higiene / Farmacia)
-                res = await fetch(`https://world.openbeautyfacts.org/api/v0/product/${barcode}.json`);
-                data = await res.json();
-
-                if (data.status === 1 && data.product) {
-                    const nombre = data.product.product_name_es || data.product.product_name || '';
-                    const marca = data.product.brands ? `${data.product.brands} ` : '';
-                    const imagen = data.product.image_front_small_url || data.product.image_url || '';
-
-                    if (nombre) {
-                        aplicarDatosWeb(`${marca}${nombre}`, imagen);
-                        return;
+                // 2. Open Beauty Facts (Cosméticos, desodorantes, cuidado personal)
+                try {
+                    const res = await fetchConTimeout(`https://world.openbeautyfacts.org/api/v0/product/${encodeURIComponent(barcode)}.json`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.status === 1 && data.product) {
+                            const nombre = data.product.product_name_es || data.product.product_name || '';
+                            const marca = data.product.brands ? `${data.product.brands} ` : '';
+                            const imagen = data.product.image_front_small_url || data.product.image_url || '';
+                            if (nombre) {
+                                aplicarDatosWeb(`${marca}${nombre}`, imagen);
+                                return;
+                            }
+                        }
                     }
+                } catch (e) { errorDeRed = true; }
+
+                if (errorDeRed) {
+                    estadoEl.style.color = '#d97706';
+                    estadoEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> El navegador o el servicio tardó/bloqueó la consulta. Escribe el nombre o sube una foto.';
+                } else {
+                    estadoEl.style.color = '#d97706';
+                    estadoEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Código no encontrado en bases públicas. Puedes escribir el nombre o subir una foto.';
                 }
-
-                // 3. Intentar con UPCitemdb (Base general de productos comerciales)
-                res = await fetch(`https://api.upcitemdb.com/prod/trial/lookup?upc=${barcode}`);
-                data = await res.json();
-
-                if (data.code === "OK" && data.items && data.items.length > 0) {
-                    const item = data.items[0];
-                    const nombre = item.title || '';
-                    const imagen = (item.images && item.images.length > 0) ? item.images[0] : '';
-
-                    if (nombre) {
-                        aplicarDatosWeb(nombre, imagen);
-                        return;
-                    }
-                }
-
-                // Si no se encontró en ninguna base pública
-                estadoEl.style.color = '#d97706';
-                estadoEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> No encontrado en bases públicas. Puedes escribir el nombre manualmente.';
-                document.getElementById('prod-nombre').focus();
-
-            } catch (error) {
-                estadoEl.style.color = '#e11d48';
-                estadoEl.innerHTML = '<i class="fa-solid fa-wifi"></i> Sin conexión o servicio ocupado. Ingresa los datos manualmente.';
-                document.getElementById('prod-nombre').focus();
             } finally {
                 btnWeb.disabled = false;
             }
@@ -570,14 +569,47 @@
 
         function aplicarDatosWeb(nombreCompleto, urlImagen) {
             const estadoEl = document.getElementById('estado-busqueda-web');
-            document.getElementById('prod-nombre').value = nombreCompleto.toUpperCase();
+            const campoNombre = document.getElementById('prod-nombre');
+            if (!campoNombre.value.trim()) {
+                campoNombre.value = nombreCompleto.toUpperCase();
+            }
             if (urlImagen) {
                 document.getElementById('prod-imagen').value = urlImagen;
                 actualizarVistaPreviaImagen();
             }
             estadoEl.style.color = '#059669';
-            estadoEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> ¡Producto encontrado! Verifica el precio y stock.';
-            document.getElementById('prod-precio').focus();
+            estadoEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> Datos encontrados. Revisa el nombre, foto, precio y stock.';
+        }
+
+        function cargarImagenLocal(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imgTemp = new Image();
+                imgTemp.onload = function() {
+                    // Comprimir ligeramente para no llenar localStorage
+                    const canvas = document.createElement('canvas');
+                    const maxSize = 240;
+                    let width = imgTemp.width;
+                    let height = imgTemp.height;
+                    if (width > height) {
+                        if (width > maxSize) { height *= maxSize / width; width = maxSize; }
+                    } else {
+                        if (height > maxSize) { width *= maxSize / height; height = maxSize; }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(imgTemp, 0, 0, width, height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    document.getElementById('prod-imagen').value = dataUrl;
+                    actualizarVistaPreviaImagen();
+                };
+                imgTemp.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
         }
 
         function actualizarVistaPreviaImagen() {
@@ -706,7 +738,6 @@
             } else { 
                 limpiarFormProducto(); 
                 document.getElementById('prod-barcode').value = barcode; 
-                // Si el producto no existe en nuestro inventario local, intenta buscarlo automáticamente en la web
                 buscarProductoEnWeb(barcode);
             }
         }
