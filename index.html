@@ -42,8 +42,7 @@
         .clear-btn { position: absolute; right: 8px; background: none; border: none; color: #9ca3af; font-size: 1.1rem; cursor: pointer; padding: 4px; line-height: 1; }
         .clear-btn:hover { color: #374151; }
 
-        input[type="text"], input[type="number"], input[type="date"], input[type="url"], select { width: 100%; padding: 9px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9rem; outline: none; background: #fff; }
-        input[type="text"]:not(#prod-imagen) { text-transform: uppercase; }
+        input[type="text"], input[type="number"], input[type="date"], select { width: 100%; padding: 9px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9rem; text-transform: uppercase; outline: none; background: #fff; }
         input:focus, select:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
         
         /* Botones */
@@ -54,8 +53,8 @@
         .btn-success:hover { background-color: #047857; }
         .btn-secondary { background-color: #e5e7eb; color: #374151; }
         .btn-secondary:hover { background-color: #d1d5db; }
-        .btn-info { background-color: #0284c7; color: white; }
-        .btn-info:hover { background-color: #0369a1; }
+        .btn-danger { background-color: #e11d48; color: white; }
+        .btn-danger:hover { background-color: #be123c; }
 
         /* Grid System */
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -92,10 +91,6 @@
         .badge-contado { background-color: #d1fae5; color: #065f46; }
         .badge-credito { background-color: #fef3c7; color: #92400e; }
         .hidden { display: none !important; }
-
-        /* Miniatura de imagen de producto */
-        .prod-thumb { width: 55px; height: 55px; object-fit: contain; border-radius: 6px; border: 1px solid #e5e7eb; background: #fff; flex-shrink: 0; }
-        .prod-thumb-placeholder { width: 55px; height: 55px; border-radius: 6px; border: 1px dashed #d1d5db; background: #f3f4f6; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 1.2rem; flex-shrink: 0; }
 
         #lector-camara video { width: 100% !important; height: auto !important; border-radius: 8px; }
     </style>
@@ -134,12 +129,9 @@
                         <label>Código de Barra</label>
                         <div class="input-group">
                             <input type="text" id="prod-barcode" onchange="verificarBarcodeStock()" placeholder="Escanear o escribir">
-                            <button type="button" onclick="abrirEscanerCamara('stock')" class="btn btn-secondary" style="width: auto; padding: 0 12px;" title="Escanear con cámara"><i class="fa-solid fa-barcode" style="font-size: 1.1rem;"></i></button>
-                            <button type="button" id="btn-buscar-web" onclick="buscarProductoEnWeb()" class="btn btn-info" style="width: auto; padding: 0 12px;" title="Buscar nombre e imagen en Internet"><i class="fa-solid fa-globe"></i></button>
+                            <button type="button" onclick="abrirEscanerCamara('stock')" class="btn btn-secondary" style="width: auto; padding: 0 12px;"><i class="fa-solid fa-barcode" style="font-size: 1.1rem;"></i></button>
                         </div>
-                        <small id="estado-busqueda-web" style="display: block; margin-top: 4px; font-size: 0.75rem; color: #0284c7;"></small>
                     </div>
-
                     <div class="form-group">
                         <label>Nombre del Producto</label>
                         <div class="input-with-clear">
@@ -147,23 +139,6 @@
                             <button type="button" class="clear-btn" onclick="limpiarInput('prod-nombre')">&times;</button>
                         </div>
                     </div>
-
-                    <div class="form-group">
-                        <label>Imagen del Producto (Enlace Web o Foto)</label>
-                        <div style="display: flex; gap: 8px; align-items: center;">
-                            <img id="preview-prod-imagen" src="" alt="Vista previa" class="prod-thumb hidden">
-                            <div id="placeholder-prod-imagen" class="prod-thumb-placeholder"><i class="fa-solid fa-image"></i></div>
-                            <div class="input-with-clear" style="flex-grow: 1;">
-                                <input type="text" id="prod-imagen" oninput="actualizarVistaPreviaImagen()" placeholder="https://... o sube una foto" style="text-transform: none; font-size: 0.8rem;">
-                                <button type="button" class="clear-btn" onclick="limpiarInput('prod-imagen'); actualizarVistaPreviaImagen();">&times;</button>
-                            </div>
-                            <label class="btn btn-secondary" style="width: auto; padding: 8px 10px; margin: 0; cursor: pointer;" title="Subir foto">
-                                <i class="fa-solid fa-camera"></i>
-                                <input type="file" accept="image/*" onchange="cargarImagenLocal(event)" class="hidden">
-                            </label>
-                        </div>
-                    </div>
-
                     <div class="grid-2">
                         <div class="form-group">
                             <label>Precio (L)</label>
@@ -456,7 +431,7 @@
     <!-- Script de Funcionalidad -->
     <script>
         let productos = JSON.parse(localStorage.getItem('hob_productos')) || [
-            { id: 1, name: 'BETADER GC 15G', barcode: '742832001', price: 93.00, stock: 1, image: '' }
+            { id: 1, name: 'BETADER GC 15G', barcode: '742832001', price: 93.00, stock: 1 }
         ];
         let clientes = JSON.parse(localStorage.getItem('hob_clientes')) || [];
         let ventas = JSON.parse(localStorage.getItem('hob_ventas')) || [];
@@ -495,141 +470,6 @@
             if (pestanaId === 'creditos') renderizarCreditos();
             if (pestanaId === 'ventas') poblarSelectoresVenta();
             window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function fetchConTimeout(url, ms = 5000) {
-            const controller = new AbortController();
-            const timer = setTimeout(() => controller.abort(), ms);
-            return fetch(url, { signal: controller.signal }).finally(() => clearTimeout(timer));
-        }
-
-        // --- BÚSQUEDA EN LA WEB POR CÓDIGO DE BARRAS ---
-        async function buscarProductoEnWeb(codigoForzado = null) {
-            const barcode = (codigoForzado || document.getElementById('prod-barcode').value).trim();
-            const estadoEl = document.getElementById('estado-busqueda-web');
-            const btnWeb = document.getElementById('btn-buscar-web');
-
-            if (!barcode) {
-                alert('Escribe o escanea un código de barras primero.');
-                return;
-            }
-
-            estadoEl.style.color = '#0284c7';
-            estadoEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Consultando bases públicas...';
-            btnWeb.disabled = true;
-
-            let errorDeRed = false;
-
-            try {
-                // 1. Open Food Facts
-                try {
-                    const res = await fetchConTimeout(`https://world.openfoodfacts.org/api/v0/product/${encodeURIComponent(barcode)}.json`);
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (data.status === 1 && data.product) {
-                            const nombre = data.product.product_name_es || data.product.product_name || '';
-                            const marca = data.product.brands ? `${data.product.brands} ` : '';
-                            const imagen = data.product.image_front_small_url || data.product.image_url || '';
-                            if (nombre) {
-                                aplicarDatosWeb(`${marca}${nombre}`, imagen);
-                                return;
-                            }
-                        }
-                    }
-                } catch (e) { errorDeRed = true; }
-
-                // 2. Open Beauty Facts (Cosméticos, desodorantes, cuidado personal)
-                try {
-                    const res = await fetchConTimeout(`https://world.openbeautyfacts.org/api/v0/product/${encodeURIComponent(barcode)}.json`);
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (data.status === 1 && data.product) {
-                            const nombre = data.product.product_name_es || data.product.product_name || '';
-                            const marca = data.product.brands ? `${data.product.brands} ` : '';
-                            const imagen = data.product.image_front_small_url || data.product.image_url || '';
-                            if (nombre) {
-                                aplicarDatosWeb(`${marca}${nombre}`, imagen);
-                                return;
-                            }
-                        }
-                    }
-                } catch (e) { errorDeRed = true; }
-
-                if (errorDeRed) {
-                    estadoEl.style.color = '#d97706';
-                    estadoEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> El navegador o el servicio tardó/bloqueó la consulta. Escribe el nombre o sube una foto.';
-                } else {
-                    estadoEl.style.color = '#d97706';
-                    estadoEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Código no encontrado en bases públicas. Puedes escribir el nombre o subir una foto.';
-                }
-            } finally {
-                btnWeb.disabled = false;
-            }
-        }
-
-        function aplicarDatosWeb(nombreCompleto, urlImagen) {
-            const estadoEl = document.getElementById('estado-busqueda-web');
-            const campoNombre = document.getElementById('prod-nombre');
-            if (!campoNombre.value.trim()) {
-                campoNombre.value = nombreCompleto.toUpperCase();
-            }
-            if (urlImagen) {
-                document.getElementById('prod-imagen').value = urlImagen;
-                actualizarVistaPreviaImagen();
-            }
-            estadoEl.style.color = '#059669';
-            estadoEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> Datos encontrados. Revisa el nombre, foto, precio y stock.';
-        }
-
-        function cargarImagenLocal(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const imgTemp = new Image();
-                imgTemp.onload = function() {
-                    // Comprimir ligeramente para no llenar localStorage
-                    const canvas = document.createElement('canvas');
-                    const maxSize = 240;
-                    let width = imgTemp.width;
-                    let height = imgTemp.height;
-                    if (width > height) {
-                        if (width > maxSize) { height *= maxSize / width; width = maxSize; }
-                    } else {
-                        if (height > maxSize) { width *= maxSize / height; height = maxSize; }
-                    }
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(imgTemp, 0, 0, width, height);
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-                    document.getElementById('prod-imagen').value = dataUrl;
-                    actualizarVistaPreviaImagen();
-                };
-                imgTemp.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-            event.target.value = '';
-        }
-
-        function actualizarVistaPreviaImagen() {
-            const url = document.getElementById('prod-imagen').value.trim();
-            const img = document.getElementById('preview-prod-imagen');
-            const placeholder = document.getElementById('placeholder-prod-imagen');
-
-            if (url) {
-                img.src = url;
-                img.classList.remove('hidden');
-                placeholder.classList.add('hidden');
-                img.onerror = () => {
-                    img.classList.add('hidden');
-                    placeholder.classList.remove('hidden');
-                };
-            } else {
-                img.src = '';
-                img.classList.add('hidden');
-                placeholder.classList.remove('hidden');
-            }
         }
 
         function exportarRespaldo() {
@@ -738,7 +578,7 @@
             } else { 
                 limpiarFormProducto(); 
                 document.getElementById('prod-barcode').value = barcode; 
-                buscarProductoEnWeb(barcode);
+                document.getElementById('prod-nombre').focus(); 
             }
         }
 
@@ -786,15 +626,15 @@
             if (lista.length === 0) { contenedor.innerHTML = `<p class="text-center" style="color:#9ca3af; padding:8px;">Sin resultados.</p>`; return; }
             lista.forEach(item => {
                 const div = document.createElement('div');
-                div.style.cssText = "padding: 8px 10px; border-bottom: 1px solid #e5e7eb; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 8px;";
+                div.style.cssText = "padding: 8px 10px; border-bottom: 1px solid #e5e7eb; cursor: pointer; display: flex; justify-content: space-between; align-items: center;";
                 if (modoModalActual === 'stock') {
-                    div.innerHTML = `<div style="display:flex; align-items:center; gap:8px;">${item.image ? `<img src="${item.image}" style="width:30px; height:30px; object-fit:contain; border-radius:4px;">` : ''}<span><strong>${item.name}</strong> (Stock: ${item.stock})</span></div><span style="color:#4f46e5;">L ${item.price.toFixed(2)}</span>`;
+                    div.innerHTML = `<span><strong>${item.name}</strong> (Stock: ${item.stock})</span><span style="color:#4f46e5;">L ${item.price.toFixed(2)}</span>`;
                     div.onclick = () => { editarProducto(item.id); cerrarModalBusqueda(); };
                 } else if (modoModalActual === 'cliente') {
                     div.innerHTML = `<span><strong>${item.nombre}</strong></span><span style="font-size:0.75rem; color:#6b7280;">Tel: ${item.telefono || '-'}</span>`;
                     div.onclick = () => { editarCliente(item.id); cerrarModalBusqueda(); };
                 } else if (modoModalActual === 'venta') {
-                    div.innerHTML = `<div style="display:flex; align-items:center; gap:8px;">${item.image ? `<img src="${item.image}" style="width:30px; height:30px; object-fit:contain; border-radius:4px;">` : ''}<span><strong>${item.name}</strong> (Stock: ${item.stock})</span></div><span style="color:#4f46e5;">L ${item.price.toFixed(2)}</span>`;
+                    div.innerHTML = `<span><strong>${item.name}</strong> (Stock: ${item.stock})</span><span style="color:#4f46e5;">L ${item.price.toFixed(2)}</span>`;
                     div.onclick = () => {
                         document.getElementById('venta-producto-id').value = item.id;
                         document.getElementById('venta-producto-nombre').value = `${item.name} (L ${item.price.toFixed(2)})`;
@@ -813,15 +653,14 @@
             const id = document.getElementById('producto-id').value;
             const name = document.getElementById('prod-nombre').value.trim().toUpperCase();
             const barcode = document.getElementById('prod-barcode').value.trim().toUpperCase();
-            const image = document.getElementById('prod-imagen').value.trim();
             const price = parseFloat(document.getElementById('prod-precio').value);
             const stock = parseInt(document.getElementById('prod-stock').value);
 
             if (id) {
                 const idx = productos.findIndex(p => p.id == id);
-                if (idx !== -1) productos[idx] = { id: Number(id), name, barcode, price, stock, image };
+                if (idx !== -1) productos[idx] = { id: Number(id), name, barcode, price, stock };
             } else {
-                productos.push({ id: Date.now(), name, barcode, price, stock, image });
+                productos.push({ id: Date.now(), name, barcode, price, stock });
             }
             productos.sort((a, b) => a.name.localeCompare(b.name));
             localStorage.setItem('hob_productos', JSON.stringify(productos));
@@ -834,8 +673,6 @@
         function limpiarFormProducto() {
             document.getElementById('form-producto').reset();
             document.getElementById('producto-id').value = '';
-            document.getElementById('estado-busqueda-web').innerHTML = '';
-            actualizarVistaPreviaImagen();
             document.getElementById('stock-form-titulo').innerHTML = `<i class="fa-solid fa-box-open" style="color: #4f46e5;"></i> Stock de Productos`;
             document.getElementById('btn-guardar-producto').textContent = "Guardar Producto";
             document.getElementById('btn-cancelar-producto').classList.add('hidden');
@@ -850,18 +687,11 @@
             filtrados.forEach(p => {
                 const div = document.createElement('div');
                 div.style.cssText = "background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px;";
-                const imgHtml = p.image 
-                    ? `<img src="${p.image}" alt="${p.name}" class="prod-thumb" onerror="this.style.display='none'">` 
-                    : `<div class="prod-thumb-placeholder"><i class="fa-solid fa-box"></i></div>`;
-
                 div.innerHTML = `
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        ${imgHtml}
-                        <div>
-                            <h4 style="font-weight: bold; color: #1f2937; font-size: 0.9rem;">${p.name}</h4>
-                            <p style="font-size: 0.75rem; color: #6b7280;">Cód: ${p.barcode || 'N/A'}</p>
-                            <p style="font-size: 0.8rem; color: #4f46e5; font-weight: 600; margin-top: 3px;">Stock: ${p.stock} | L ${p.price.toFixed(2)}</p>
-                        </div>
+                    <div>
+                        <h4 style="font-weight: bold; color: #1f2937; font-size: 0.9rem;">${p.name}</h4>
+                        <p style="font-size: 0.75rem; color: #6b7280;">Cód: ${p.barcode || 'N/A'}</p>
+                        <p style="font-size: 0.8rem; color: #4f46e5; font-weight: 600; margin-top: 3px;">Stock: ${p.stock} | L ${p.price.toFixed(2)}</p>
                     </div>
                     <div style="display: flex; gap: 6px; justify-content: flex-end; border-top: 1px solid #e5e7eb; padding-top: 6px;">
                         <button onclick="abrirModalImprimir(${p.id})" class="btn btn-secondary" style="width: auto; padding: 5px 8px; color: #059669; font-size: 0.8rem;" title="Etiqueta"><i class="fa-solid fa-print"></i></button>
@@ -879,8 +709,6 @@
             document.getElementById('producto-id').value = p.id;
             document.getElementById('prod-nombre').value = p.name;
             document.getElementById('prod-barcode').value = p.barcode || '';
-            document.getElementById('prod-imagen').value = p.image || '';
-            actualizarVistaPreviaImagen();
             document.getElementById('prod-precio').value = p.price;
             document.getElementById('prod-stock').value = p.stock;
             document.getElementById('stock-form-titulo').innerHTML = `<i class="fa-solid fa-pen" style="color: #4f46e5;"></i> Editar Producto`;
